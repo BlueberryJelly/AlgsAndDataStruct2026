@@ -87,13 +87,13 @@ public:
     explicit Matrix(const Matrix<NumericType> &other)
         : _rows(other._rows), _columns(other._columns)
     {
-        copy_data();
+        copy_data(other);
     }
 
     explicit Matrix(Matrix<NumericType> &&other)
         : _rows(other._rows), _columns(other._columns)
     {
-        move_data();
+        move_data(std::move(other));
     }
 
     ~Matrix() noexcept
@@ -106,7 +106,7 @@ public:
         if (this != &other)
         {
             free_matrix();
-            copy_matrix;
+            copy_matrix(other);
         }
         return *this;
     }
@@ -116,7 +116,7 @@ public:
         if (this != &other)
         {
             free_matrix();
-            move_matrix();
+            move_matrix(std::move(other));
         }
         return *this;
     }
