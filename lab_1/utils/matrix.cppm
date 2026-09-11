@@ -20,8 +20,8 @@ private:
 
     void copy_data(const Matrix<NumericType> &matrix)
     {
-        _data = new NumericType[_rows * _columns];
-        for (std::size_t index = 0; index < _rows * _columns; ++index)
+        _data = new NumericType[matrix._rows * matrix._columns];
+        for (std::size_t index = 0; index < matrix._rows * matrix._columns; ++index)
         {
             _data[index] = matrix._data[index];
         }
@@ -29,12 +29,12 @@ private:
 
     void copy_matrix(const Matrix<NumericType> &matrix)
     {
+        copy_data(matrix);
         _rows = matrix._rows;
         _columns = matrix._columns;
-        copy_data(matrix);
     }
 
-    void move_data(Matrix<NumericType> &&matrix)
+    void move_data(Matrix<NumericType> &&matrix) noexcept
     {
         _data = matrix._data;
         matrix._data = nullptr;
@@ -42,18 +42,18 @@ private:
         matrix._columns = 0;
     }
 
-    void move_matrix(Matrix<NumericType> &&matrix)
+    void move_matrix(Matrix<NumericType> &&matrix) noexcept
     {
         _rows = matrix._rows;
         _columns = matrix._columns;
         move_data(std::move(matrix));
     }
 
-    void validate_index(const std::size_t row, const std::size_t column)
+    void validate_index(const std::size_t row, const std::size_t column) const
     {
         if (row >= _rows || column >= _columns)
         {
-            throw std::invalid_argument("Incorrect indexe(s) for matrix");
+            throw std::out_of_range("Incorrect index(indexes) for matrix");
         }
     }
 
@@ -63,15 +63,19 @@ public:
     Matrix(const std::size_t rows, const std::size_t columns,
            const NumericType &value)
     {
-        if (columns != 0 &&
-            rows > std::numeric_limits<std::size_t>::max() / columns)
+        if (rows == 0 || columns == 0)
+        {
+            throw std::length_error("Prohibited size");
+        }
+
+        if (rows > std::numeric_limits<std::size_t>::max() / columns)
         {
             throw std::length_error("Size overflow");
         }
 
+        _data = new NumericType[rows * columns];
         _rows = rows;
         _columns = columns;
-        _data = new NumericType[_rows * _columns];
 
         try
         {
@@ -84,13 +88,21 @@ public:
         }
     }
 
-    explicit Matrix(const Matrix<NumericType> &other)
+    Matrix(const Matrix<NumericType> &other)
         : _rows(other._rows), _columns(other._columns)
     {
-        copy_data(other);
+        try
+        {
+            copy_data(other);
+        }
+        catch (...)
+        {
+            free_matrix();
+            throw;
+        }
     }
 
-    explicit Matrix(Matrix<NumericType> &&other)
+    Matrix(Matrix<NumericType> &&other) noexcept
         : _rows(other._rows), _columns(other._columns)
     {
         move_data(std::move(other));
@@ -111,7 +123,7 @@ public:
         return *this;
     }
 
-    Matrix<NumericType> &operator=(Matrix<NumericType> &&other)
+    Matrix<NumericType> &operator=(Matrix<NumericType> &&other) noexcept
     {
         if (this != &other)
         {
@@ -141,10 +153,5 @@ public:
     std::size_t get_columns() const noexcept
     {
         return _columns;
-    }
-
-    const NumericType *get_data() const noexcept
-    {
-        return _data;
     }
 };
