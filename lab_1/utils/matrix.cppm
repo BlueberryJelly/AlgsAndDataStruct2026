@@ -18,15 +18,33 @@ private:
         _columns = 0;
     }
 
+    void copy_data(const Matrix<NumericType> &matrix)
+    {
+        _data = new NumericType[_rows * _columns];
+        for (std::size_t index = 0; index < _rows * _columns; ++index)
+        {
+            _data[index] = matrix._data[index];
+        }
+    }
+
+    void copy_matrix(const Matrix<NumericType> &matrix)
+    {
+        _rows = matrix._rows;
+        _columns = matrix._columns;
+        copy_data(matrix);
+    }
+
     void validate_index(const std::size_t row, const std::size_t column)
     {
-        if (row >= _rows || column >= columns)
+        if (row >= _rows || column >= _columns)
         {
             throw std::invalid_argument("Incorrect indexe(s) for matrix");
         }
     }
 
 public:
+    Matrix() = delete;
+
     Matrix(const std::size_t rows, const std::size_t columns,
            const NumericType &value)
     {
@@ -49,6 +67,21 @@ public:
             free_matrix();
             throw;
         }
+    }
+
+    explicit Matrix(const Matrix<NumericType> &other)
+        : _rows(other._rows), _columns(other._columns)
+    {
+        copy_data();
+    }
+
+    explicit Matrix(Matrix<NumericType> &&other)
+        : _rows(other._rows), _columns(other._columns)
+    {
+        _data = other._data;
+        other._data = nullptr;
+        other._rows = 0;
+        other._columns = 0;
     }
 
     ~Matrix() noexcept
