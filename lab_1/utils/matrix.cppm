@@ -34,6 +34,21 @@ private:
         copy_data(matrix);
     }
 
+    void move_data(Matrix<NumericType> &&matrix)
+    {
+        _data = matrix._data;
+        matrix._data = nullptr;
+        matrix._rows = 0;
+        matrix._columns = 0;
+    }
+
+    void move_matrix(Matrix<NumericType> &&matrix)
+    {
+        _rows = matrix._rows;
+        _columns = matrix._columns;
+        move_data(std::move(matrix));
+    }
+
     void validate_index(const std::size_t row, const std::size_t column)
     {
         if (row >= _rows || column >= _columns)
@@ -78,15 +93,32 @@ public:
     explicit Matrix(Matrix<NumericType> &&other)
         : _rows(other._rows), _columns(other._columns)
     {
-        _data = other._data;
-        other._data = nullptr;
-        other._rows = 0;
-        other._columns = 0;
+        move_data();
     }
 
     ~Matrix() noexcept
     {
         free_matrix();
+    }
+
+    Matrix<NumericType> &operator=(const Matrix<NumericType> &other)
+    {
+        if (this != &other)
+        {
+            free_matrix();
+            copy_matrix;
+        }
+        return *this;
+    }
+
+    Matrix<NumericType> &operator=(Matrix<NumericType> &&other)
+    {
+        if (this != &other)
+        {
+            free_matrix();
+            move_matrix();
+        }
+        return *this;
     }
 
     const NumericType &operator[](const std::size_t row, const std::size_t column) const
