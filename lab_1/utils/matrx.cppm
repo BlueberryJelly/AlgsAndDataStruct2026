@@ -18,7 +18,7 @@ private:
         _columns = 0;
     }
 
-    void validate_index(std::size_t row, std::size_t column)
+    void validate_index(const std::size_t row, const std::size_t column)
     {
         if (row >= _rows || column >= columns)
         {
@@ -66,5 +66,20 @@ public:
     {
         validate_index(row, column);
         return _data[row * _columns + column];
+    }
+
+    std::size_t get_rows() const noexcept
+    {
+        return _rows;
+    }
+
+    std::size_t get_columns() const noexcept
+    {
+        return _columns;
+    }
+
+    const NumericType *_data() const noexcept
+    {
+        return _data;
     }
 };
