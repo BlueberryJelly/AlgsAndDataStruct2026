@@ -78,7 +78,7 @@ public:
         return _columns;
     }
 
-    const NumericType *_data() const noexcept
+    const NumericType *get_data() const noexcept
     {
         return _data;
     }
