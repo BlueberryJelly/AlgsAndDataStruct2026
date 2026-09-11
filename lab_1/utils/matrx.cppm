@@ -18,6 +18,14 @@ private:
         _columns = 0;
     }
 
+    void validate_index(std::size_t row, std::size_t column)
+    {
+        if (row >= _rows || column >= columns)
+        {
+            throw std::invalid_argument("Incorrect indexe(s) for matrix");
+        }
+    }
+
 public:
     Matrix(const std::size_t rows, const std::size_t columns,
            const NumericType &value)
@@ -46,5 +54,17 @@ public:
     ~Matrix() noexcept
     {
         free_matrix();
+    }
+
+    const NumericType &operator[](const std::size_t row, const std::size_t column) const noexcept
+    {
+        validate_index(row, column);
+        return _data[row * _columns + column];
+    }
+
+    NumericType &operator[](const std::size_t row, const std::size_t column) noexcept
+    {
+        validate_index(row, column);
+        return _data[row * _columns + column];
     }
 };
