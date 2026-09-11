@@ -56,13 +56,13 @@ public:
         free_matrix();
     }
 
-    const NumericType &operator[](const std::size_t row, const std::size_t column) const noexcept
+    const NumericType &operator[](const std::size_t row, const std::size_t column) const
     {
         validate_index(row, column);
         return _data[row * _columns + column];
     }
 
-    NumericType &operator[](const std::size_t row, const std::size_t column) noexcept
+    NumericType &operator[](const std::size_t row, const std::size_t column)
     {
         validate_index(row, column);
         return _data[row * _columns + column];
