@@ -30,6 +30,25 @@ private:
         }
     }
 
+    static void validate_range(const NumericType &min, const NumericType &max)
+    {
+        if constexpr (std::same_as<NumericType, std::complex<float>> ||
+                      std::same_as<NumericType, std::complex<double>>)
+        {
+            if (min.real() > max.real() || min.imag() > max.imag())
+            {
+                throw std::invalid_argument("Min must be <= max component-wise");
+            }
+        }
+        else
+        {
+            if (min > max)
+            {
+                throw std::invalid_argument("Min must be <= max");
+            }
+        }
+    }
+
     void allocate_uninitialized(const std::size_t rows, const std::size_t columns)
     {
         validate_dimensions(rows, columns);
@@ -143,8 +162,9 @@ public:
     }
 
     Matrix(const std::size_t rows, const std::size_t columns,
-           const NumericType &min = NumericType{0}, const NumericType &max = NumericType{1})
+           const NumericType &min, const NumericType &max)
     {
+        validate_range(min, max);
         allocate_uninitialized(rows, columns);
 
         try
