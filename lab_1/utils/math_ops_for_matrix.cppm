@@ -64,5 +64,24 @@ Matrix<NumericType> operator*(const Matrix<NumericType> &left, const Matrix<Nume
             }
         }
     }
+
+    return product;
+}
+
+export template <typename NumericType>
+Matrix<NumericType> operator*(const Matrix<NumericType> &left, const NumericType &right)
+{
+    Matrix<NumericType> product(left);
+    product *= right;
+
+    return product;
+}
+
+export template <typename NumericType>
+Matrix<NumericType> operator*(const NumericType &left, const Matrix<NumericType> &right)
+{
+    Matrix<NumericType> product(right);
+    product *= left;
+
     return product;
 }

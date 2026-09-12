@@ -212,6 +212,28 @@ public:
         return *this;
     }
 
+    Matrix<NumericType> &operator*=(const NumericType &factor) noexcept
+    {
+        std::size_t size = _rows * _columns;
+        for (std::size_t index = 0; index < size; ++index)
+        {
+            _data[index] *= factor;
+        }
+
+        return *this;
+    }
+
+    Matrix<NumericType> &operator/=(const NumericType &factor) noexcept
+    {
+        std::size_t size = _rows * _columns;
+        for (std::size_t index = 0; index < size; ++index)
+        {
+            _data[index] /= factor;
+        }
+
+        return *this;
+    }
+
     void multiplyable(const Matrix<NumericType> &other) const
     {
         if (_columns != other._rows)
