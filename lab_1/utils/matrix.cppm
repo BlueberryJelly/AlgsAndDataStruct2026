@@ -91,6 +91,38 @@ private:
         }
     }
 
+    static std::mt19937_64 &random_engine()
+    {
+        static std::mt19937_64 generator(std::random_device{}());
+        return generator;
+    }
+
+    static NumericType generate_random_value(std::mt19937_64 &generator,
+                                             const NumericType &min,
+                                             const NumericType &max)
+    {
+        if constexpr (std::floating_point<NumericType>)
+        {
+            std::uniform_real_distribution<NumericType> distribution(min, max);
+            return distribution(generator);
+        }
+        else if constexpr (std::same_as<NumericType, std::complex<float>> ||
+                           std::same_as<NumericType, std::complex<double>>)
+        {
+            using ValueType = typename NumericType::value_type;
+            std::uniform_real_distribution<ValueType> real_distribution(min.real(), max.real());
+            std::uniform_real_distribution<ValueType> imag_distribution(min.imag(), max.imag());
+            return NumericType(real_distribution(generator), imag_distribution(generator));
+        }
+        else
+        {
+            using DistType = std::conditional_t<(sizeof(NumericType) < sizeof(short)), int, NumericType>;
+            std::uniform_int_distribution<DistType> distribution(static_cast<DistType>(min),
+                                                                 static_cast<DistType>(max));
+            return static_cast<NumericType>(distribution(generator));
+        }
+    }
+
 public:
     Matrix() = delete;
 
@@ -102,6 +134,27 @@ public:
         try
         {
             std::fill(_data, _data + _rows * _columns, value);
+        }
+        catch (...)
+        {
+            free_matrix();
+            throw;
+        }
+    }
+
+    Matrix(const std::size_t rows, const std::size_t columns,
+           const NumericType &min = NumericType{0}, const NumericType &max = NumericType{1})
+    {
+        allocate_uninitialized(rows, columns);
+
+        try
+        {
+            auto &generator = random_engine();
+            std::size_t size = _rows * _columns;
+            for (std::size_t index = 0; index < size; ++index)
+            {
+                _data[index] = generate_random_value(generator, min, max);
+            }
         }
         catch (...)
         {
