@@ -222,8 +222,16 @@ public:
         return *this;
     }
 
-    Matrix<NumericType> &operator/=(const NumericType &factor) noexcept
+    Matrix<NumericType> &operator/=(const NumericType &factor)
     {
+        if constexpr (std::integral<NumericType>)
+        {
+            if (factor == 0)
+            {
+                throw std::invalid_argument("Division by zero");
+            }
+        }
+
         std::size_t size = _rows * _columns;
         for (std::size_t index = 0; index < size; ++index)
         {
