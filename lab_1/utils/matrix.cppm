@@ -2,7 +2,13 @@ export module matrix;
 
 import std;
 
-export template <typename NumericType>
+export template <typename Type>
+concept MatrixType = (std::integral<Type> && !std::same_as<Type, bool>) ||
+                     std::floating_point<Type> ||
+                     std::same_as<Type, std::complex<float>> ||
+                     std::same_as<Type, std::complex<double>>;
+
+export template <MatrixType NumericType>
 class Matrix final
 {
 private:
@@ -273,6 +279,37 @@ public:
         }
 
         return trace;
+    }
+
+    bool equal(const Matrix<NumericType> &other) const noexcept
+    {
+        if (!same_size(other))
+        {
+            return false;
+        }
+
+        std::size_t size = _rows * _columns;
+        for (std::size_t index = 0; index < size; ++index)
+        {
+            if constexpr (std::floating_point<NumericType> ||
+                          std::same_as<NumericType, std::complex<float>> ||
+                          std::same_as<NumericType, std::complex<double>>)
+            {
+                if (std::abs(_data[index] - other._data[index]) > _epsilon)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (_data[index] != other._data[index])
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     std::size_t get_rows() const noexcept

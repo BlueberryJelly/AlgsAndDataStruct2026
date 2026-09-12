@@ -3,33 +3,19 @@ export module math_ops_for_matrix;
 import std;
 import matrix;
 
-export template <typename NumericType>
+export template <MatrixType NumericType>
 bool operator==(const Matrix<NumericType> &left, const Matrix<NumericType> &right) noexcept
 {
-    if (!left.same_size(right))
-    {
-        return false;
-    }
-
-    std::size_t size = left.get_rows() * left.get_columns();
-    for (std::size_t index = 0; index < size; ++index)
-    {
-        if (left.get_data()[index] != right.get_data()[index])
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return left.equal(right);
 }
 
-export template <typename NumericType>
+export template <MatrixNumeric NumericType>
 bool operator!=(const Matrix<NumericType> &left, const Matrix<NumericType> &right) noexcept
 {
     return !(left == right);
 }
 
-export template <typename NumericType>
+export template <MatrixNumeric NumericType>
 Matrix<NumericType> operator+(const Matrix<NumericType> &left, const Matrix<NumericType> &right)
 {
     left.validate_sum_subtraction(right);
@@ -39,7 +25,7 @@ Matrix<NumericType> operator+(const Matrix<NumericType> &left, const Matrix<Nume
     return sum;
 }
 
-export template <typename NumericType>
+export template <MatrixNumeric NumericType>
 Matrix<NumericType> operator-(const Matrix<NumericType> &left, const Matrix<NumericType> &right)
 {
     left.validate_sum_subtraction(right);
@@ -49,7 +35,7 @@ Matrix<NumericType> operator-(const Matrix<NumericType> &left, const Matrix<Nume
     return subtraction;
 }
 
-export template <typename NumericType>
+export template <MatrixNumeric NumericType>
 Matrix<NumericType> operator*(const Matrix<NumericType> &left, const Matrix<NumericType> &right)
 {
     left.multiplyable(right);
@@ -68,7 +54,7 @@ Matrix<NumericType> operator*(const Matrix<NumericType> &left, const Matrix<Nume
     return product;
 }
 
-export template <typename NumericType>
+export template <MatrixNumeric NumericType>
 Matrix<NumericType> operator*(const Matrix<NumericType> &left, const NumericType &right)
 {
     Matrix<NumericType> product(left);
@@ -77,7 +63,7 @@ Matrix<NumericType> operator*(const Matrix<NumericType> &left, const NumericType
     return product;
 }
 
-export template <typename NumericType>
+export template <MatrixNumeric NumericType>
 Matrix<NumericType> operator*(const NumericType &left, const Matrix<NumericType> &right)
 {
     Matrix<NumericType> product(right);
