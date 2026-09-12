@@ -3,12 +3,12 @@ export module matrix;
 import std;
 
 export template <typename Type>
-concept MatrixType = (std::integral<Type> && !std::same_as<Type, bool>) ||
-                     std::floating_point<Type> ||
-                     std::same_as<Type, std::complex<float>> ||
-                     std::same_as<Type, std::complex<double>>;
+concept MatrixNumeric = (std::integral<Type> && !std::same_as<Type, bool>) ||
+                        std::floating_point<Type> ||
+                        std::same_as<Type, std::complex<float>> ||
+                        std::same_as<Type, std::complex<double>>;
 
-export template <MatrixType NumericType>
+export template <MatrixNumeric NumericType>
 class Matrix final
 {
 private:

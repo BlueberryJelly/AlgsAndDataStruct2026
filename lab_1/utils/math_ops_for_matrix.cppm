@@ -3,7 +3,7 @@ export module math_ops_for_matrix;
 import std;
 import matrix;
 
-export template <MatrixType NumericType>
+export template <MatrixNumeric NumericType>
 bool operator==(const Matrix<NumericType> &left, const Matrix<NumericType> &right) noexcept
 {
     return left.equal(right);
