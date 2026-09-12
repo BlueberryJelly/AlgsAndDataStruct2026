@@ -175,28 +175,41 @@ public:
         return _data[row * _columns + column];
     }
 
-    bool operator==(const Matrix<NumericType> &other) const noexcept
+    bool same_size(const Matrix<NumericType> &other) const noexcept
     {
-        if (_rows != other._rows || _columns != other._columns)
-        {
-            return false;
-        }
+        return _rows == other._rows && _columns == other._columns;
+    }
 
+    void validate_sum_subtraction(const Matrix<NumericType> &other) const
+    {
+        if (!same_size(other))
+        {
+            throw std::logic_error("It's impossible to subtract or add");
+        }
+    }
+
+    Matrix<NumericType> &operator+=(const Matrix<NumericType> &other)
+    {
+        validate_sum_subtraction(other);
         std::size_t size = _rows * _columns;
         for (std::size_t index = 0; index < size; ++index)
         {
-            if (this[index] != other._data[index])
-            {
-                return false;
-            }
+            _data[index] += other._data[index];
         }
 
-        return true;
+        return *this;
     }
 
-    bool operator!=(const Matrix<NumericType> &other) const noexcept
+    Matrix<NumericType> &operator-=(const Matrix<NumericType> &other)
     {
-        return *this == other;
+        validate_sum_subtraction(other);
+        std::size_t size = _rows * _columns;
+        for (std::size_t index = 0; index < size; ++index)
+        {
+            _data[index] -= other._data[index];
+        }
+
+        return *this;
     }
 
     std::size_t get_rows() const noexcept
@@ -207,5 +220,10 @@ public:
     std::size_t get_columns() const noexcept
     {
         return _columns;
+    }
+
+    const NumericType *get_data() const noexcept
+    {
+        return _data;
     }
 };

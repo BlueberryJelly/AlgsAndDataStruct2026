@@ -11,3 +11,5 @@ endfunction()
 
 add_cpp_module_library(matrix matrix.cppm)
 add_cpp_module_library(inverse_matrix inverse_matrix.cppm)
+add_cpp_module_library(math_ops_for_matrix math_ops_for_matrix.cppm)
+target_link_libraries(math_ops_for_matrix PRIVATE matrix)
