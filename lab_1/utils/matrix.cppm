@@ -10,18 +10,24 @@ private:
     std::size_t _columns = 0;
     NumericType *_data = nullptr;
 
-    void free_matrix() noexcept
+    void free_data() noexcept
     {
         delete[] _data;
         _data = nullptr;
+    }
+
+    void free_matrix() noexcept
+    {
+        free_data();
         _rows = 0;
         _columns = 0;
     }
 
     void copy_data(const Matrix<NumericType> &matrix)
     {
-        _data = new NumericType[matrix._rows * matrix._columns];
-        for (std::size_t index = 0; index < matrix._rows * matrix._columns; ++index)
+        std::size_t size = matrix._rows * matrix._columns;
+        _data = new NumericType[size];
+        for (std::size_t index = 0; index < size; ++index)
         {
             _data[index] = matrix._data[index];
         }
@@ -58,6 +64,7 @@ private:
     }
 
 public:
+    // Запрещает создание объекта с _data = nullptr.
     Matrix() = delete;
 
     Matrix(const std::size_t rows, const std::size_t columns,
@@ -110,17 +117,7 @@ public:
 
     ~Matrix() noexcept
     {
-        free_matrix();
-    }
-
-    Matrix<NumericType> &operator=(const Matrix<NumericType> &other)
-    {
-        if (this != &other)
-        {
-            free_matrix();
-            copy_matrix(other);
-        }
-        return *this;
+        free_data();
     }
 
     Matrix<NumericType> &operator=(Matrix<NumericType> &&other) noexcept
@@ -133,13 +130,42 @@ public:
         return *this;
     }
 
-    const NumericType &operator[](const std::size_t row, const std::size_t column) const
+    Matrix<NumericType> &operator=(const Matrix<NumericType> &other)
+    {
+        if (this != &other)
+        {
+            Matrix<NumericType> copy(std::move(*this));
+
+            try
+            {
+                copy_matrix(other);
+            }
+            catch (...)
+            {
+                *this = std::move(copy);
+                throw;
+            }
+        }
+        return *this;
+    }
+
+    const NumericType &operator[](const std::size_t row, const std::size_t column) const noexcept
+    {
+        return _data[row * _columns + column];
+    }
+
+    NumericType &operator[](const std::size_t row, const std::size_t column) noexcept
+    {
+        return _data[row * _columns + column];
+    }
+
+    const NumericType &at(const std::size_t row, const std::size_t column) const
     {
         validate_index(row, column);
         return _data[row * _columns + column];
     }
 
-    NumericType &operator[](const std::size_t row, const std::size_t column)
+    NumericType &at(const std::size_t row, const std::size_t column)
     {
         validate_index(row, column);
         return _data[row * _columns + column];
