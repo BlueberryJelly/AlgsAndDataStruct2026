@@ -9,6 +9,28 @@ private:
     std::size_t _rows = 0;
     std::size_t _columns = 0;
     NumericType *_data = nullptr;
+    static constexpr double _epsilon = 1e-9;
+
+    static void validate_dimensions(const std::size_t rows, const std::size_t columns)
+    {
+        if (rows == 0 || columns == 0)
+        {
+            throw std::length_error("Prohibited size");
+        }
+
+        if (rows > std::numeric_limits<std::size_t>::max() / columns)
+        {
+            throw std::length_error("Size overflow");
+        }
+    }
+
+    void allocate_uninitialized(const std::size_t rows, const std::size_t columns)
+    {
+        validate_dimensions(rows, columns);
+        _data = new NumericType[rows * columns];
+        _rows = rows;
+        _columns = columns;
+    }
 
     void free_data() noexcept
     {
@@ -69,19 +91,7 @@ public:
     Matrix(const std::size_t rows, const std::size_t columns,
            const NumericType &value)
     {
-        if (rows == 0 || columns == 0)
-        {
-            throw std::length_error("Prohibited size");
-        }
-
-        if (rows > std::numeric_limits<std::size_t>::max() / columns)
-        {
-            throw std::length_error("Size overflow");
-        }
-
-        _data = new NumericType[rows * columns];
-        _rows = rows;
-        _columns = columns;
+        allocate_uninitialized(rows, columns);
 
         try
         {
@@ -278,6 +288,11 @@ public:
     const NumericType *get_data() const noexcept
     {
         return _data;
+    }
+
+    double get_epsilon() const noexcept
+    {
+        return _epsilon;
     }
 
     bool square_matrix() const noexcept
