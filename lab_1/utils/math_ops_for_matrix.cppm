@@ -71,3 +71,12 @@ Matrix<NumericType> operator*(const NumericType &left, const Matrix<NumericType>
 
     return product;
 }
+
+export template <MatrixNumeric NumericType>
+Matrix<NumericType> operator/(const Matrix<NumericType> &left, const NumericType &right)
+{
+    Matrix<NumericType> quotient(left);
+    quotient /= right;
+
+    return quotient;
+}
