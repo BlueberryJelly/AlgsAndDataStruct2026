@@ -424,9 +424,9 @@ public:
         validate_index(skip_row, skip_column);
 
         Matrix<NumericType> element_minor(_rows - 1, _columns - 1, NumericType{0});
-        for (std::size_t row = 0; row < rows; ++row)
+        for (std::size_t row = 0; row < _rows; ++row)
         {
-            for (std::size_t column = 0; column < columns; ++columns)
+            for (std::size_t column = 0; column < _columns; ++column)
             {
                 if (row != skip_row && column != skip_column)
                 {
