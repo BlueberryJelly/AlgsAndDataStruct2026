@@ -413,4 +413,28 @@ public:
     {
         return _rows == _columns;
     }
+
+    Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::size_t skip_column)
+    {
+        if (!square_matrix())
+        {
+            throw std::logic_error("Only a square matrix has an element minor");
+        }
+
+        validate_index(skip_row, skip_column);
+
+        Matrix<NumericType> element_minor(_rows - 1, _columns - 1, NumericType{0});
+        for (std::size_t row = 0; row < rows; ++row)
+        {
+            for (std::size_t column = 0; column < columns; ++columns)
+            {
+                if (row != skip_row && column != skip_column)
+                {
+                    element_minor[row, column] = *this[row, column];
+                }
+            }
+        }
+
+        return element_minor;
+    }
 };
