@@ -142,6 +142,28 @@ private:
         }
     }
 
+    template <typename Operation>
+    Matrix<NumericType> &apply_elementwise(const Matrix<NumericType> &other, Operation operation)
+    {
+        std::size_t size = _rows * _columns;
+        for (std::size_t index = 0; index < size; ++index)
+        {
+            operation(_data[index], other._data[index]);
+        }
+        return *this;
+    }
+
+    template <typename Operation>
+    Matrix<NumericType> &apply_scalar_elementwise(const NumericType &factor, Operation operation)
+    {
+        std::size_t size = _rows * _columns;
+        for (std::size_t index = 0; index < size; ++index)
+        {
+            operation(_data[index], factor);
+        }
+        return *this;
+    }
+
 public:
     Matrix() = delete;
 
@@ -279,36 +301,23 @@ public:
     Matrix<NumericType> &operator+=(const Matrix<NumericType> &other)
     {
         validate_sum_subtraction(other);
-        std::size_t size = _rows * _columns;
-        for (std::size_t index = 0; index < size; ++index)
-        {
-            _data[index] += other._data[index];
-        }
 
-        return *this;
+        return apply_elementwise(other, [](NumericType &left, const NumericType &right)
+                                 { left += right; });
     }
 
     Matrix<NumericType> &operator-=(const Matrix<NumericType> &other)
     {
         validate_sum_subtraction(other);
-        std::size_t size = _rows * _columns;
-        for (std::size_t index = 0; index < size; ++index)
-        {
-            _data[index] -= other._data[index];
-        }
 
-        return *this;
+        return apply_elementwise(other, [](NumericType &left, const NumericType &right)
+                                 { left -= right; });
     }
 
-    Matrix<NumericType> &operator*=(const NumericType &factor) noexcept
+    Matrix<NumericType> &operator*=(const NumericType &factor)
     {
-        std::size_t size = _rows * _columns;
-        for (std::size_t index = 0; index < size; ++index)
-        {
-            _data[index] *= factor;
-        }
-
-        return *this;
+        return apply_scalar_elementwise(factor, [](NumericType &left, const NumericType &right)
+                                        { left *= right; });
     }
 
     Matrix<NumericType> &operator/=(const NumericType &factor)
@@ -321,13 +330,8 @@ public:
             }
         }
 
-        std::size_t size = _rows * _columns;
-        for (std::size_t index = 0; index < size; ++index)
-        {
-            _data[index] /= factor;
-        }
-
-        return *this;
+        return apply_scalar_elementwise(factor, [](NumericType &left, const NumericType &right)
+                                        { left /= right; });
     }
 
     void multiplyable(const Matrix<NumericType> &other) const
