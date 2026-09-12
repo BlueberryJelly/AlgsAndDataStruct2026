@@ -212,6 +212,14 @@ public:
         return *this;
     }
 
+    void multiplyable(const Matrix<NumericType> &other) const
+    {
+        if (_columns != other._rows)
+        {
+            throw std::logic_error("It's impossible to multiply");
+        }
+    }
+
     std::size_t get_rows() const noexcept
     {
         return _rows;
