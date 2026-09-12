@@ -64,7 +64,6 @@ private:
     }
 
 public:
-    // Запрещает создание объекта с _data = nullptr.
     Matrix() = delete;
 
     Matrix(const std::size_t rows, const std::size_t columns,
