@@ -143,7 +143,8 @@ private:
     }
 
     template <typename Operation>
-    Matrix<NumericType> &apply_elementwise(const Matrix<NumericType> &other, Operation operation)
+    Matrix<NumericType> &apply_elementwise(const Matrix<NumericType> &other,
+                                           Operation operation)
     {
         std::size_t size = _rows * _columns;
         for (std::size_t index = 0; index < size; ++index)
@@ -154,7 +155,8 @@ private:
     }
 
     template <typename Operation>
-    Matrix<NumericType> &apply_scalar_elementwise(const NumericType &factor, Operation operation)
+    Matrix<NumericType> &apply_scalar_elementwise(const NumericType &factor,
+                                                  Operation operation)
     {
         std::size_t size = _rows * _columns;
         for (std::size_t index = 0; index < size; ++index)
@@ -162,6 +164,20 @@ private:
             operation(_data[index], factor);
         }
         return *this;
+    }
+
+    static bool approximately_equal(const NumericType &left, const NumericType &right) noexcept
+    {
+        if constexpr (std::floating_point<NumericType> ||
+                      std::same_as<NumericType, std::complex<float>> ||
+                      std::same_as<NumericType, std::complex<double>>)
+        {
+            return std::abs(left - right) <= static_cast<decltype(std::abs(left - right))>(_epsilon);
+        }
+        else
+        {
+            return left == right;
+        }
     }
 
 public:
@@ -368,21 +384,9 @@ public:
         std::size_t size = _rows * _columns;
         for (std::size_t index = 0; index < size; ++index)
         {
-            if constexpr (std::floating_point<NumericType> ||
-                          std::same_as<NumericType, std::complex<float>> ||
-                          std::same_as<NumericType, std::complex<double>>)
+            if (!approximately_equal(_data[index], other._data[index]))
             {
-                if (std::abs(_data[index] - other._data[index]) > _epsilon)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (_data[index] != other._data[index])
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -414,7 +418,7 @@ public:
         return _rows == _columns;
     }
 
-    Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::size_t skip_column)
+    Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::size_t skip_column) const
     {
         if (!square_matrix())
         {
@@ -424,17 +428,72 @@ public:
         validate_index(skip_row, skip_column);
 
         Matrix<NumericType> element_minor(_rows - 1, _columns - 1, NumericType{0});
+
+        std::size_t dest_row = 0;
+        for (std::size_t row = 0; row < _rows; ++row)
+        {
+            if (row == skip_row)
+            {
+                continue;
+            }
+
+            std::size_t dest_column = 0;
+            for (std::size_t column = 0; column < _columns; ++column)
+            {
+                if (column == skip_column)
+                {
+                    continue;
+                }
+
+                element_minor[dest_row, dest_column] = (*this)[row, column];
+                ++dest_column;
+            }
+            ++dest_row;
+        }
+
+        return element_minor;
+    }
+
+    NumericType get_determinant() const
+    {
+        if (!square_matrix())
+        {
+            throw std::logic_error("Only a square matrix has a determinant");
+        }
+
+        if (_rows == 1)
+        {
+            return (*this)[0, 0];
+        }
+
+        NumericType determinant{};
+        for (std::size_t column = 0; column < _columns; ++column)
+        {
+            const NumericType &element = (*this)[0, column];
+
+            if (approximately_equal(element, NumericType{0}))
+            {
+                continue;
+            }
+
+            NumericType sign = (column % 2 == 0) ? NumericType{1} : NumericType{-1};
+            determinant += sign * element * get_element_minor(0, column).get_determinant();
+        }
+
+        return determinant;
+    }
+
+    Matrix<NumericType> transpose() const
+    {
+        Matrix<NumericType> transposed_matrix(_columns, _rows, 0);
         for (std::size_t row = 0; row < _rows; ++row)
         {
             for (std::size_t column = 0; column < _columns; ++column)
             {
-                if (row != skip_row && column != skip_column)
-                {
-                    element_minor[row, column] = *this[row, column];
-                }
+                transposed_matrix[column, row] = (*this)[row, column];
             }
         }
 
-        return element_minor;
+        return transposed_matrix;
     }
 };
