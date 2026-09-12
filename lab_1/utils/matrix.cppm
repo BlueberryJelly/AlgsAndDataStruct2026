@@ -127,6 +127,7 @@ public:
             free_matrix();
             move_matrix(std::move(other));
         }
+
         return *this;
     }
 
@@ -146,6 +147,7 @@ public:
                 throw;
             }
         }
+
         return *this;
     }
 
@@ -162,13 +164,39 @@ public:
     const NumericType &at(const std::size_t row, const std::size_t column) const
     {
         validate_index(row, column);
+
         return _data[row * _columns + column];
     }
 
     NumericType &at(const std::size_t row, const std::size_t column)
     {
         validate_index(row, column);
+
         return _data[row * _columns + column];
+    }
+
+    bool operator==(const Matrix<NumericType> &other) const noexcept
+    {
+        if (_rows != other._rows || _columns != other._columns)
+        {
+            return false;
+        }
+
+        std::size_t size = _rows * _columns;
+        for (std::size_t index = 0; index < size; ++index)
+        {
+            if (this[index] != other._data[index])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool operator!=(const Matrix<NumericType> &other) const noexcept
+    {
+        return *this == other;
     }
 
     std::size_t get_rows() const noexcept
