@@ -381,11 +381,6 @@ public:
         return _columns;
     }
 
-    const NumericType *get_data() const noexcept
-    {
-        return _data;
-    }
-
     RealType get_epsilon() const noexcept
     {
         return _epsilon;
