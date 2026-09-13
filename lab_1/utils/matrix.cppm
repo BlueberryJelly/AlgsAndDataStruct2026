@@ -353,7 +353,7 @@ public:
             throw std::logic_error("Only a square matrix has a trace");
         }
 
-        NumericType trace{};
+        NumericType trace(0);
         for (std::size_t index = 0; index < _rows; ++index)
         {
             trace += (*this)[index, index];

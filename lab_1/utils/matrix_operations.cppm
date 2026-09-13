@@ -153,7 +153,10 @@ NumericType get_determinant(const Matrix<NumericType> &matrix)
     {
         return matrix[0, 0];
     }
-
+    else if (matrix.get_rows() == 2)
+    {
+        return matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0];
+    }
     NumericType determinant(0);
     for (std::size_t column = 0; column < matrix.get_columns(); ++column)
     {
