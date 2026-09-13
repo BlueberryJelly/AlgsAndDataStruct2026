@@ -1,4 +1,4 @@
-export module math_ops_for_matrix;
+export module matrix_operations;
 
 import std;
 import matrix;
@@ -77,19 +77,24 @@ Matrix<NumericType> operator/(const Matrix<NumericType> &left, const NumericType
     return quotient /= scalar;
 }
 
-Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::size_t skip_column) const
+export template <MatrixNumeric NumericType>
+Matrix<NumericType> get_element_minor(const Matrix<NumericType> &matrix,
+                                      const std::size_t skip_row,
+                                      const std::size_t skip_column)
 {
-    if (!square_matrix())
+    if (!matrix.square_matrix())
     {
         throw std::logic_error("Only a square matrix has an element minor");
     }
 
-    validate_index(skip_row, skip_column);
+    matrix.validate_index(skip_row, skip_column);
 
-    Matrix<NumericType> element_minor(_rows - 1, _columns - 1, NumericType{0});
+    Matrix<NumericType> element_minor(matrix.get_rows() - 1,
+                                      matrix.get_columns() - 1,
+                                      NumericType{0});
 
     std::size_t dest_row = 0;
-    for (std::size_t row = 0; row < _rows; ++row)
+    for (std::size_t row = 0; row < matrix.get_rows(); ++row)
     {
         if (row == skip_row)
         {
@@ -97,14 +102,14 @@ Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::siz
         }
 
         std::size_t dest_column = 0;
-        for (std::size_t column = 0; column < _columns; ++column)
+        for (std::size_t column = 0; column < matrix.get_columns(); ++column)
         {
             if (column == skip_column)
             {
                 continue;
             }
 
-            element_minor[dest_row, dest_column] = (*this)[row, column];
+            element_minor[dest_row, dest_column] = matrix[row, column];
             ++dest_column;
         }
         ++dest_row;
@@ -113,45 +118,47 @@ Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::siz
     return element_minor;
 }
 
-NumericType get_determinant() const
+export template <MatrixNumeric NumericType>
+NumericType get_determinant(const Matrix<NumericType> &matrix)
 {
-    if (!square_matrix())
+    if (!matrix.square_matrix())
     {
         throw std::logic_error("Only a square matrix has a determinant");
     }
 
-    if (_rows == 1)
+    if (matrix.get_rows() == 1)
     {
-        return (*this)[0, 0];
+        return matrix[0, 0];
     }
 
-    NumericType determinant{};
-    for (std::size_t column = 0; column < _columns; ++column)
+    NumericType determinant(0);
+    for (std::size_t column = 0; column < matrix.get_columns(); ++column)
     {
-        const NumericType &element = (*this)[0, column];
+        const NumericType &element = matrix[0, column];
 
-        if (approximately_equal(element, NumericType{0}))
+        if (std::abs(element - NumericType{0}) <= matrix.get_epsilon())
         {
             continue;
         }
 
         NumericType sign = (column % 2 == 0) ? NumericType{1} : NumericType{-1};
-        determinant += sign * element * get_element_minor(0, column).get_determinant();
+        determinant += sign * element * get_determinant(get_element_minor(matrix, 0, column));
     }
 
     return determinant;
 }
 
-Matrix<NumericType> transpose() const
+export template <MatrixNumeric NumericType>
+Matrix<NumericType> transpose(const Matrix<NumericType> &matrix)
 {
-    Matrix<NumericType> transposed_matrix(_columns, _rows, 0);
-    for (std::size_t row = 0; row < _rows; ++row)
+    Matrix<NumericType> transposed(matrix.get_columns(), matrix.get_rows(), NumericType{0});
+    for (std::size_t row = 0; row < matrix.get_rows(); ++row)
     {
-        for (std::size_t column = 0; column < _columns; ++column)
+        for (std::size_t column = 0; column < matrix.get_columns(); ++column)
         {
-            transposed_matrix[column, row] = (*this)[row, column];
+            transposed[column, row] = matrix[row, column];
         }
     }
 
-    return transposed_matrix;
+    return transposed;
 }

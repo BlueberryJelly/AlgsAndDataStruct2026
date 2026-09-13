@@ -18,7 +18,9 @@ template <typename T>
 using extract_real_type_t = typename extract_real_type<T>::type;
 
 export template <typename Type>
-concept MatrixNumeric = (std::integral<Type> && !std::same_as<Type, bool>) ||
+concept MatrixNumeric = (std::integral<Type> &&
+                         !std::same_as<Type, bool> &&
+                         !std::unsigned_integral<Type>) ||
                         std::floating_point<Type> ||
                         std::same_as<Type, std::complex<float>> ||
                         std::same_as<Type, std::complex<double>>;
@@ -107,14 +109,6 @@ private:
         _columns = source._columns;
         _size = source._size;
         move_data(std::move(source));
-    }
-
-    void validate_index(const std::size_t row, const std::size_t column) const
-    {
-        if (row >= _rows || column >= _columns)
-        {
-            throw std::out_of_range("Incorrect index(indexes) for matrix");
-        }
     }
 
     static std::mt19937_64 &random_engine()
@@ -212,7 +206,7 @@ public:
 
     Matrix(const Matrix<NumericType> &other)
     {
-        allocate_uninitialized(other._rows, other.columns);
+        allocate_uninitialized(other._rows, other._columns);
 
         try
         {
@@ -237,9 +231,10 @@ public:
         free_data();
     }
 
-    Matrix<NumericType> &operator=(Matrix<NumericType> other) noexcept
+    Matrix<NumericType> &operator=(const Matrix<NumericType> &other)
     {
-        std::swap(*this, other);
+        Matrix<NumericType> copy(other);
+        std::swap(*this, copy);
 
         return *this;
     }
@@ -263,6 +258,14 @@ public:
     NumericType &operator[](const std::size_t row, const std::size_t column) noexcept
     {
         return _data[row * _columns + column];
+    }
+
+    void validate_index(const std::size_t row, const std::size_t column) const
+    {
+        if (row >= _rows || column >= _columns)
+        {
+            throw std::out_of_range("Incorrect index(indexes) for matrix");
+        }
     }
 
     const NumericType &at(const std::size_t row, const std::size_t column) const
@@ -316,12 +319,9 @@ public:
 
     void validate_scalar_division(const NumericType &scalar) const
     {
-        if constexpr (std::integral<NumericType>)
+        if (std::abs(scalar - NumericType{0}) <= _epsilon)
         {
-            if (scalar == 0)
-            {
-                throw std::invalid_argument("Division by zero");
-            }
+            throw std::invalid_argument("Division by zero");
         }
     }
 
@@ -407,7 +407,7 @@ public:
         return _data;
     }
 
-    double get_epsilon() const noexcept
+    RealType get_epsilon() const noexcept
     {
         return _epsilon;
     }
