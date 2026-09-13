@@ -105,11 +105,13 @@ std::ostream &operator<<(std::ostream &oss, const Matrix<NumericType> &matrix)
     return oss;
 }
 
+export template <MatrixNumeric NumericType>
 bool square_matrix(const Matrix<NumericType> &matrix) noexcept
 {
     return matrix.get_rows() == matrix.get_columns();
 }
 
+export template <MatrixNumeric NumericType>
 NumericType trace(const Matrix<NumericType> &matrix)
 {
     if (!square_matrix(matrix))

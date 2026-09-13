@@ -7,7 +7,7 @@ import matrix_operations;
 export template <MatrixNumeric NumericType>
 Matrix<NumericType> inverse(const Matrix<NumericType> &matrix)
 {
-    if (!matrix.square_matrix())
+    if (!square_matrix(matrix))
     {
         throw std::logic_error("Only a square matrix has an inverse matrix");
     }
