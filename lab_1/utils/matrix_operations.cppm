@@ -53,28 +53,28 @@ Matrix<NumericType> operator*(const Matrix<NumericType> &left, const Matrix<Nume
 }
 
 export template <MatrixNumeric NumericType>
-Matrix<NumericType> operator*(const Matrix<NumericType> &left, const NumericType &right)
+Matrix<NumericType> operator*(const Matrix<NumericType> &left, const NumericType &scalar)
 {
     Matrix<NumericType> product(left);
 
-    return product *= right;
+    return product *= scalar;
 }
 
 export template <MatrixNumeric NumericType>
-Matrix<NumericType> operator*(const NumericType &left, const Matrix<NumericType> &right)
+Matrix<NumericType> operator*(const NumericType &scalar, const Matrix<NumericType> &right)
 {
     Matrix<NumericType> product(right);
 
-    return product *= left;
+    return product *= scalar;
 }
 
 export template <MatrixNumeric NumericType>
-Matrix<NumericType> operator/(const Matrix<NumericType> &left, const NumericType &right)
+Matrix<NumericType> operator/(const Matrix<NumericType> &left, const NumericType &scalar)
 {
-    validate_scalar_division(right);
+    left.validate_scalar_division(scalar);
     Matrix<NumericType> quotient(left);
 
-    return quotient /= right;
+    return quotient /= scalar;
 }
 
 Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::size_t skip_column) const

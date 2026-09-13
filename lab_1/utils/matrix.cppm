@@ -255,14 +255,14 @@ public:
     {
         validate_index(row, column);
 
-        return _data[row * _columns + column];
+        return (*this)[row, column];
     }
 
     NumericType &at(const std::size_t row, const std::size_t column)
     {
         validate_index(row, column);
 
-        return _data[row * _columns + column];
+        return (*this)[row, column];
     }
 
     bool same_size(const Matrix<NumericType> &other) const noexcept
@@ -274,7 +274,7 @@ public:
     {
         if (!same_size(other))
         {
-            throw std::logic_error("It's impossible to subtract or add");
+            throw std::logic_error("It's impossible to add or subtract");
         }
     }
 
@@ -327,6 +327,11 @@ public:
         }
     }
 
+    bool square_matrix() const noexcept
+    {
+        return _rows == _columns;
+    }
+
     NumericType trace() const
     {
         if (!square_matrix())
@@ -350,8 +355,7 @@ public:
             return false;
         }
 
-        std::size_t size = _rows * _columns;
-        for (std::size_t index = 0; index < size; ++index)
+        for (std::size_t index = 0; index < _size; ++index)
         {
             if constexpr (std::floating_point<NumericType> ||
                           std::same_as<NumericType, std::complex<float>> ||
@@ -392,10 +396,5 @@ public:
     double get_epsilon() const noexcept
     {
         return _epsilon;
-    }
-
-    bool square_matrix() const noexcept
-    {
-        return _rows == _columns;
     }
 };
