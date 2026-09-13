@@ -20,8 +20,9 @@ Matrix<NumericType> operator+(const Matrix<NumericType> &left, const Matrix<Nume
 {
     left.validate_sum_subtraction(right);
     Matrix<NumericType> sum(left);
+    sum += right;
 
-    return sum += right;
+    return sum;
 }
 
 export template <MatrixNumeric NumericType>
@@ -29,8 +30,9 @@ Matrix<NumericType> operator-(const Matrix<NumericType> &left, const Matrix<Nume
 {
     left.validate_sum_subtraction(right);
     Matrix<NumericType> subtraction(left);
+    subtraction -= right;
 
-    return subtraction -= right;
+    return subtraction;
 }
 
 export template <MatrixNumeric NumericType>
@@ -56,16 +58,18 @@ export template <MatrixNumeric NumericType>
 Matrix<NumericType> operator*(const Matrix<NumericType> &left, const NumericType &scalar)
 {
     Matrix<NumericType> product(left);
+    product *= scalar;
 
-    return product *= scalar;
+    return product;
 }
 
 export template <MatrixNumeric NumericType>
 Matrix<NumericType> operator*(const NumericType &scalar, const Matrix<NumericType> &right)
 {
     Matrix<NumericType> product(right);
+    product *= scalar;
 
-    return product *= scalar;
+    return product;
 }
 
 export template <MatrixNumeric NumericType>
@@ -73,8 +77,9 @@ Matrix<NumericType> operator/(const Matrix<NumericType> &left, const NumericType
 {
     left.validate_scalar_division(scalar);
     Matrix<NumericType> quotient(left);
+    quotient /= scalar;
 
-    return quotient /= scalar;
+    return quotient;
 }
 
 export template <MatrixNumeric NumericType>
@@ -100,12 +105,33 @@ std::ostream &operator<<(std::ostream &oss, const Matrix<NumericType> &matrix)
     return oss;
 }
 
+bool square_matrix(const Matrix<NumericType> &matrix) noexcept
+{
+    return matrix.get_rows() == matrix.get_columns();
+}
+
+NumericType trace(const Matrix<NumericType> &matrix)
+{
+    if (!square_matrix(matrix))
+    {
+        throw std::logic_error("Only a square matrix has a trace");
+    }
+
+    NumericType trace{0};
+    for (std::size_t index = 0; index < matrix.get_rows(); ++index)
+    {
+        trace += matrix[index, index];
+    }
+
+    return trace;
+}
+
 export template <MatrixNumeric NumericType>
 Matrix<NumericType> get_element_minor(const Matrix<NumericType> &matrix,
                                       const std::size_t skip_row,
                                       const std::size_t skip_column)
 {
-    if (!matrix.square_matrix())
+    if (!square_matrix(matrix))
     {
         throw std::logic_error("Only a square matrix has an element minor");
     }
@@ -144,7 +170,7 @@ Matrix<NumericType> get_element_minor(const Matrix<NumericType> &matrix,
 export template <MatrixNumeric NumericType>
 NumericType get_determinant(const Matrix<NumericType> &matrix)
 {
-    if (!matrix.square_matrix())
+    if (!square_matrix(matrix))
     {
         throw std::logic_error("Only a square matrix has a determinant");
     }

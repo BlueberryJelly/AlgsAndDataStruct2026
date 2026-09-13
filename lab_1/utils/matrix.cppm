@@ -341,27 +341,6 @@ public:
         }
     }
 
-    bool square_matrix() const noexcept
-    {
-        return _rows == _columns;
-    }
-
-    NumericType trace() const
-    {
-        if (!square_matrix())
-        {
-            throw std::logic_error("Only a square matrix has a trace");
-        }
-
-        NumericType trace(0);
-        for (std::size_t index = 0; index < _rows; ++index)
-        {
-            trace += (*this)[index, index];
-        }
-
-        return trace;
-    }
-
     bool equal(const Matrix<NumericType> &other) const noexcept
     {
         if (!same_size(other))
