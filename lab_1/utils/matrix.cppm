@@ -15,7 +15,9 @@ private:
     std::size_t _rows = 0;
     std::size_t _columns = 0;
     NumericType *_data = nullptr;
-    static constexpr double _epsilon = 1e-9;
+
+    using RealType = extract_real_type_t<NumericType>;
+    static constexpr RealType _epsilon = std::numeric_limits<RealType>::epsilon();
 
     static void validate_dimensions(const std::size_t rows, const std::size_t columns)
     {
@@ -155,29 +157,15 @@ private:
     }
 
     template <typename Operation>
-    Matrix<NumericType> &apply_scalar_elementwise(const NumericType &factor,
+    Matrix<NumericType> &apply_scalar_elementwise(const NumericType &scalar,
                                                   Operation operation)
     {
         std::size_t size = _rows * _columns;
         for (std::size_t index = 0; index < size; ++index)
         {
-            operation(_data[index], factor);
+            operation(_data[index], scalar);
         }
         return *this;
-    }
-
-    static bool approximately_equal(const NumericType &left, const NumericType &right) noexcept
-    {
-        if constexpr (std::floating_point<NumericType> ||
-                      std::same_as<NumericType, std::complex<float>> ||
-                      std::same_as<NumericType, std::complex<double>>)
-        {
-            return std::abs(left - right) <= static_cast<decltype(std::abs(left - right))>(_epsilon);
-        }
-        else
-        {
-            return left == right;
-        }
     }
 
 public:
@@ -330,23 +318,28 @@ public:
                                  { left -= right; });
     }
 
-    Matrix<NumericType> &operator*=(const NumericType &factor)
+    Matrix<NumericType> &operator*=(const NumericType &scalar)
     {
-        return apply_scalar_elementwise(factor, [](NumericType &left, const NumericType &right)
+        return apply_scalar_elementwise(scalar, [](NumericType &left, const NumericType &right)
                                         { left *= right; });
     }
 
-    Matrix<NumericType> &operator/=(const NumericType &factor)
+    void validate_scalar_division(const NumericType &scalar) const
     {
         if constexpr (std::integral<NumericType>)
         {
-            if (factor == 0)
+            if (scalar == 0)
             {
                 throw std::invalid_argument("Division by zero");
             }
         }
+    }
 
-        return apply_scalar_elementwise(factor, [](NumericType &left, const NumericType &right)
+    Matrix<NumericType> &operator/=(const NumericType &scalar)
+    {
+        validate_scalar_division(scalar);
+
+        return apply_scalar_elementwise(scalar, [](NumericType &left, const NumericType &right)
                                         { left /= right; });
     }
 
@@ -384,9 +377,21 @@ public:
         std::size_t size = _rows * _columns;
         for (std::size_t index = 0; index < size; ++index)
         {
-            if (!approximately_equal(_data[index], other._data[index]))
+            if constexpr (std::floating_point<NumericType> ||
+                          std::same_as<NumericType, std::complex<float>> ||
+                          std::same_as<NumericType, std::complex<double>>)
             {
-                return false;
+                if (std::abs(_data[index] - other._data[index]) > _epsilon)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (_data[index] != other._data[index])
+                {
+                    return false;
+                }
             }
         }
 
@@ -416,84 +421,5 @@ public:
     bool square_matrix() const noexcept
     {
         return _rows == _columns;
-    }
-
-    Matrix<NumericType> get_element_minor(const std::size_t skip_row, const std::size_t skip_column) const
-    {
-        if (!square_matrix())
-        {
-            throw std::logic_error("Only a square matrix has an element minor");
-        }
-
-        validate_index(skip_row, skip_column);
-
-        Matrix<NumericType> element_minor(_rows - 1, _columns - 1, NumericType{0});
-
-        std::size_t dest_row = 0;
-        for (std::size_t row = 0; row < _rows; ++row)
-        {
-            if (row == skip_row)
-            {
-                continue;
-            }
-
-            std::size_t dest_column = 0;
-            for (std::size_t column = 0; column < _columns; ++column)
-            {
-                if (column == skip_column)
-                {
-                    continue;
-                }
-
-                element_minor[dest_row, dest_column] = (*this)[row, column];
-                ++dest_column;
-            }
-            ++dest_row;
-        }
-
-        return element_minor;
-    }
-
-    NumericType get_determinant() const
-    {
-        if (!square_matrix())
-        {
-            throw std::logic_error("Only a square matrix has a determinant");
-        }
-
-        if (_rows == 1)
-        {
-            return (*this)[0, 0];
-        }
-
-        NumericType determinant{};
-        for (std::size_t column = 0; column < _columns; ++column)
-        {
-            const NumericType &element = (*this)[0, column];
-
-            if (approximately_equal(element, NumericType{0}))
-            {
-                continue;
-            }
-
-            NumericType sign = (column % 2 == 0) ? NumericType{1} : NumericType{-1};
-            determinant += sign * element * get_element_minor(0, column).get_determinant();
-        }
-
-        return determinant;
-    }
-
-    Matrix<NumericType> transpose() const
-    {
-        Matrix<NumericType> transposed_matrix(_columns, _rows, 0);
-        for (std::size_t row = 0; row < _rows; ++row)
-        {
-            for (std::size_t column = 0; column < _columns; ++column)
-            {
-                transposed_matrix[column, row] = (*this)[row, column];
-            }
-        }
-
-        return transposed_matrix;
     }
 };
