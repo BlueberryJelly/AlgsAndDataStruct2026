@@ -78,6 +78,29 @@ Matrix<NumericType> operator/(const Matrix<NumericType> &left, const NumericType
 }
 
 export template <MatrixNumeric NumericType>
+std::ostream &operator<<(std::ostream &oss, const Matrix<NumericType> &matrix)
+{
+    for (std::size_t row = 0; row < matrix.get_rows(); ++row)
+    {
+        for (std::size_t column = 0; column < matrix.get_columns(); ++column)
+        {
+            oss << matrix[row, column];
+            if (column + 1 == matrix.get_columns())
+            {
+                continue;
+            }
+            else
+            {
+                oss << ", ";
+            }
+        }
+        oss << "\n";
+    }
+
+    return oss;
+}
+
+export template <MatrixNumeric NumericType>
 Matrix<NumericType> get_element_minor(const Matrix<NumericType> &matrix,
                                       const std::size_t skip_row,
                                       const std::size_t skip_column)
