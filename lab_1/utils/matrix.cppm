@@ -2,6 +2,21 @@ export module matrix;
 
 import std;
 
+template <typename T>
+struct extract_real_type
+{
+    using type = T;
+};
+
+template <typename T>
+struct extract_real_type<std::complex<T>>
+{
+    using type = T;
+};
+
+template <typename T>
+using extract_real_type_t = typename extract_real_type<T>::type;
+
 export template <typename Type>
 concept MatrixNumeric = (std::integral<Type> && !std::same_as<Type, bool>) ||
                         std::floating_point<Type> ||
@@ -120,9 +135,8 @@ private:
         else if constexpr (std::same_as<NumericType, std::complex<float>> ||
                            std::same_as<NumericType, std::complex<double>>)
         {
-            using ValueType = typename NumericType::value_type;
-            std::uniform_real_distribution<ValueType> real_distribution(min.real(), max.real());
-            std::uniform_real_distribution<ValueType> imag_distribution(min.imag(), max.imag());
+            std::uniform_real_distribution<RealType> real_distribution(min.real(), max.real());
+            std::uniform_real_distribution<RealType> imag_distribution(min.imag(), max.imag());
             return NumericType(real_distribution(generator), imag_distribution(generator));
         }
         else
