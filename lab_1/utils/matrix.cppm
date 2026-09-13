@@ -14,6 +14,7 @@ class Matrix final
 private:
     std::size_t _rows = 0;
     std::size_t _columns = 0;
+    std::size_t _size = 0;
     NumericType *_data = nullptr;
 
     using RealType = extract_real_type_t<NumericType>;
@@ -54,9 +55,11 @@ private:
     void allocate_uninitialized(const std::size_t rows, const std::size_t columns)
     {
         validate_dimensions(rows, columns);
-        _data = new NumericType[rows * columns];
+        std::size_t size = rows * columns;
+        _data = new NumericType[size];
         _rows = rows;
         _columns = columns;
+        _size = size;
     }
 
     void free_data() noexcept
@@ -67,41 +70,28 @@ private:
 
     void free_matrix() noexcept
     {
-        free_data();
+        if (_data != nullptr)
+        {
+            free_data();
+        }
         _rows = 0;
         _columns = 0;
+        _size = 0;
     }
 
-    void copy_data(const Matrix<NumericType> &matrix)
+    void move_data(Matrix<NumericType> &&source) noexcept
     {
-        std::size_t size = matrix._rows * matrix._columns;
-        _data = new NumericType[size];
-        for (std::size_t index = 0; index < size; ++index)
-        {
-            _data[index] = matrix._data[index];
-        }
+        _data = source._data;
+        source._data = nullptr;
+        source.free_matrix();
     }
 
-    void copy_matrix(const Matrix<NumericType> &matrix)
+    void move_matrix(Matrix<NumericType> &&source) noexcept
     {
-        copy_data(matrix);
-        _rows = matrix._rows;
-        _columns = matrix._columns;
-    }
-
-    void move_data(Matrix<NumericType> &&matrix) noexcept
-    {
-        _data = matrix._data;
-        matrix._data = nullptr;
-        matrix._rows = 0;
-        matrix._columns = 0;
-    }
-
-    void move_matrix(Matrix<NumericType> &&matrix) noexcept
-    {
-        _rows = matrix._rows;
-        _columns = matrix._columns;
-        move_data(std::move(matrix));
+        _rows = source._rows;
+        _columns = source._columns;
+        _size = source._size;
+        move_data(std::move(source));
     }
 
     void validate_index(const std::size_t row, const std::size_t column) const
@@ -148,8 +138,7 @@ private:
     Matrix<NumericType> &apply_elementwise(const Matrix<NumericType> &other,
                                            Operation operation)
     {
-        std::size_t size = _rows * _columns;
-        for (std::size_t index = 0; index < size; ++index)
+        for (std::size_t index = 0; index < _size; ++index)
         {
             operation(_data[index], other._data[index]);
         }
@@ -160,8 +149,7 @@ private:
     Matrix<NumericType> &apply_scalar_elementwise(const NumericType &scalar,
                                                   Operation operation)
     {
-        std::size_t size = _rows * _columns;
-        for (std::size_t index = 0; index < size; ++index)
+        for (std::size_t index = 0; index < _size; ++index)
         {
             operation(_data[index], scalar);
         }
@@ -178,7 +166,7 @@ public:
 
         try
         {
-            std::fill(_data, _data + _rows * _columns, value);
+            std::fill(_data, _data + _size, value);
         }
         catch (...)
         {
@@ -196,8 +184,7 @@ public:
         try
         {
             auto &generator = random_engine();
-            std::size_t size = _rows * _columns;
-            for (std::size_t index = 0; index < size; ++index)
+            for (std::size_t index = 0; index < _size; ++index)
             {
                 _data[index] = generate_random_value(generator, min, max);
             }
@@ -210,11 +197,13 @@ public:
     }
 
     Matrix(const Matrix<NumericType> &other)
-        : _rows(other._rows), _columns(other._columns)
     {
+        allocate_uninitialized(other._rows, other.columns);
+
         try
         {
-            copy_data(other);
+            apply_elementwise(other, [](NumericType &left, const NumericType &right)
+                              { left = right; });
         }
         catch (...)
         {
@@ -224,7 +213,7 @@ public:
     }
 
     Matrix(Matrix<NumericType> &&other) noexcept
-        : _rows(other._rows), _columns(other._columns)
+        : _rows(other._rows), _columns(other._columns), _size(other._size)
     {
         move_data(std::move(other));
     }
@@ -234,32 +223,19 @@ public:
         free_data();
     }
 
+    Matrix<NumericType> &operator=(Matrix<NumericType> other) noexcept
+    {
+        std::swap(*this, other);
+
+        return *this;
+    }
+
     Matrix<NumericType> &operator=(Matrix<NumericType> &&other) noexcept
     {
         if (this != &other)
         {
             free_matrix();
             move_matrix(std::move(other));
-        }
-
-        return *this;
-    }
-
-    Matrix<NumericType> &operator=(const Matrix<NumericType> &other)
-    {
-        if (this != &other)
-        {
-            Matrix<NumericType> copy(std::move(*this));
-
-            try
-            {
-                copy_matrix(other);
-            }
-            catch (...)
-            {
-                *this = std::move(copy);
-                throw;
-            }
         }
 
         return *this;
