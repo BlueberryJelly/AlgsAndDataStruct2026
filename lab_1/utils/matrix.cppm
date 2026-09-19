@@ -18,12 +18,20 @@ template <typename T>
 using extract_real_type_t = typename extract_real_type<T>::type;
 
 export template <typename Type>
-concept MatrixNumeric = (std::integral<Type> &&
-                         !std::same_as<Type, bool> &&
-                         !std::unsigned_integral<Type>) ||
-                        std::floating_point<Type> ||
+concept MatrixNumeric = std::same_as<Type, std::int8_t> ||
+                        std::same_as<Type, std::int16_t> ||
+                        std::same_as<Type, std::int32_t> ||
+                        std::same_as<Type, std::int64_t> ||
+                        std::same_as<Type, short> ||
+                        std::same_as<Type, int> ||
+                        std::same_as<Type, long> ||
+                        std::same_as<Type, long long> ||
+                        std::same_as<Type, float> ||
+                        std::same_as<Type, double> ||
+                        std::same_as<Type, long double> ||
                         std::same_as<Type, std::complex<float>> ||
-                        std::same_as<Type, std::complex<double>>;
+                        std::same_as<Type, std::complex<double>> ||
+                        std::same_as<Type, std::complex<long double>>;
 
 export template <MatrixNumeric NumericType>
 class Matrix final
