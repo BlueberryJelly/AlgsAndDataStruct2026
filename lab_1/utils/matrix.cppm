@@ -146,28 +146,6 @@ private:
         }
     }
 
-    template <typename Operation>
-    Matrix<NumericType> &apply_elementwise(const Matrix<NumericType> &other,
-                                           Operation operation)
-    {
-        for (std::size_t index = 0; index < _size; ++index)
-        {
-            operation(_data[index], other._data[index]);
-        }
-        return *this;
-    }
-
-    template <typename Operation>
-    Matrix<NumericType> &apply_scalar_elementwise(const NumericType &scalar,
-                                                  Operation operation)
-    {
-        for (std::size_t index = 0; index < _size; ++index)
-        {
-            operation(_data[index], scalar);
-        }
-        return *this;
-    }
-
 public:
     Matrix() = delete;
 
@@ -214,8 +192,10 @@ public:
 
         try
         {
-            apply_elementwise(other, [](NumericType &left, const NumericType &right)
-                              { left = right; });
+            for (std::size_t index = 0; index < _size; ++index)
+            {
+                _data[index] = other._data[index];
+            }
         }
         catch (...)
         {
@@ -303,22 +283,34 @@ public:
     {
         validate_sum_subtraction(other);
 
-        return apply_elementwise(other, [](NumericType &left, const NumericType &right)
-                                 { left += right; });
+        for (std::size_t index = 0; index < _size; ++index)
+        {
+            _data[index] += other._data[index];
+        }
+
+        return *this;
     }
 
     Matrix<NumericType> &operator-=(const Matrix<NumericType> &other)
     {
         validate_sum_subtraction(other);
 
-        return apply_elementwise(other, [](NumericType &left, const NumericType &right)
-                                 { left -= right; });
+        for (std::size_t index = 0; index < _size; ++index)
+        {
+            _data[index] -= other._data[index];
+        }
+
+        return *this;
     }
 
     Matrix<NumericType> &operator*=(const NumericType &scalar)
     {
-        return apply_scalar_elementwise(scalar, [](NumericType &left, const NumericType &right)
-                                        { left *= right; });
+        for (std::size_t index = 0; index < _size; ++index)
+        {
+            _data[index] *= scalar;
+        }
+
+        return *this;
     }
 
     void validate_scalar_division(const NumericType &scalar) const
@@ -333,8 +325,12 @@ public:
     {
         validate_scalar_division(scalar);
 
-        return apply_scalar_elementwise(scalar, [](NumericType &left, const NumericType &right)
-                                        { left /= right; });
+        for (std::size_t index = 0; index < _size; ++index)
+        {
+            _data[index] /= scalar;
+        }
+
+        return *this;
     }
 
     void multiplyable(const Matrix<NumericType> &other) const
