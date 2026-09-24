@@ -218,7 +218,10 @@ public:
     Matrix<NumericType> &operator=(const Matrix<NumericType> &other)
     {
         Matrix<NumericType> copy(other);
-        std::swap(*this, copy);
+        std::swap(_rows, copy._rows);
+        std::swap(_columns, copy._columns);
+        std::swap(_size, copy._size);
+        std::swap(_data, copy._data);
 
         return *this;
     }
