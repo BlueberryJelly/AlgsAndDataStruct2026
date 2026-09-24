@@ -17,21 +17,19 @@ struct extract_real_type<std::complex<T>>
 template <typename T>
 using extract_real_type_t = typename extract_real_type<T>::type;
 
+template <typename T>
+struct is_complex : std::false_type {};
+
+template <typename T>
+struct is_complex<std::complex<T>> : std::true_type {};
+
+template <typename T>
+concept IsComplex = is_complex<T>::value; 
+
 export template <typename Type>
-concept MatrixNumeric = std::same_as<Type, std::int8_t> ||
-                        std::same_as<Type, std::int16_t> ||
-                        std::same_as<Type, std::int32_t> ||
-                        std::same_as<Type, std::int64_t> ||
-                        std::same_as<Type, short> ||
-                        std::same_as<Type, int> ||
-                        std::same_as<Type, long> ||
-                        std::same_as<Type, long long> ||
-                        std::same_as<Type, float> ||
-                        std::same_as<Type, double> ||
-                        std::same_as<Type, long double> ||
-                        std::same_as<Type, std::complex<float>> ||
-                        std::same_as<Type, std::complex<double>> ||
-                        std::same_as<Type, std::complex<long double>>;
+concept MatrixNumeric = std::same_as<Type, int> ||
+                        std::floating_point<Type> ||
+                        IsComplex<Type>;
 
 export template <MatrixNumeric NumericType>
 class Matrix final
@@ -60,8 +58,7 @@ private:
 
     static void validate_range(const NumericType &min, const NumericType &max)
     {
-        if constexpr (std::same_as<NumericType, std::complex<float>> ||
-                      std::same_as<NumericType, std::complex<double>>)
+        if constexpr (IsComplex<NumericType>)
         {
             if (min.real() > max.real() || min.imag() > max.imag())
             {
@@ -134,8 +131,7 @@ private:
             std::uniform_real_distribution<NumericType> distribution(min, max);
             return distribution(generator);
         }
-        else if constexpr (std::same_as<NumericType, std::complex<float>> ||
-                           std::same_as<NumericType, std::complex<double>>)
+        else if constexpr (IsComplex<NumericType>)
         {
             std::uniform_real_distribution<RealType> real_distribution(min.real(), max.real());
             std::uniform_real_distribution<RealType> imag_distribution(min.imag(), max.imag());
@@ -358,9 +354,8 @@ public:
 
         for (std::size_t index = 0; index < _size; ++index)
         {
-            if constexpr (std::floating_point<NumericType> ||
-                          std::same_as<NumericType, std::complex<float>> ||
-                          std::same_as<NumericType, std::complex<double>>)
+            if constexpr (std::floating_point<NumericType> || 
+                IsComplex<NumericType>)
             {
                 if (std::abs(_data[index] - other._data[index]) > _epsilon)
                 {
