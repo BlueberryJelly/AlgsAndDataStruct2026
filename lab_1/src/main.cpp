@@ -113,7 +113,6 @@ void demonstrate(const std::string &label)
               << divided << "\n";
 
     std::cout << "A.get_rows() = " << a.get_rows() << ", A.get_columns() = " << a.get_columns() << "\n";
-    std::cout << "A.get_data()[0] = " << a.get_data()[0] << "\n";
     std::cout << "A.get_epsilon() = " << a.get_epsilon() << "\n\n";
 
     std::cout << "square_matrix(A): " << square_matrix(a) << "\n";
