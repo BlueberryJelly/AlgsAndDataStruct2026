@@ -73,6 +73,14 @@ public:
         }
     }
 
+    DoublyLinkedList(DoublyLinkedList &&other) noexcept
+     : _head(other._head), _size(other._size)
+    {
+        other._head = nullptr;
+        other._size = 0;
+    }
+
+
     ~DoublyLinkedList() noexcept
     {
         free_data();
