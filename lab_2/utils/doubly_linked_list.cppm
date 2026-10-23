@@ -30,7 +30,7 @@ private:
 public:
     DoublyLinkedList() noexcept = default;
 
-    DoublyLinkedList(const DoublyLinkedList &other)
+    DoublyLinkedList(const DoublyLinkedList<Value> &other)
     {
         if (other._head == nullptr)
         {
@@ -73,7 +73,7 @@ public:
         }
     }
 
-    DoublyLinkedList(DoublyLinkedList &&other) noexcept
+    DoublyLinkedList(DoublyLinkedList<Value> &&other) noexcept
      : _head(other._head), _size(other._size)
     {
         other._head = nullptr;
