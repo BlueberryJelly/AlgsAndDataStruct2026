@@ -9,3 +9,13 @@ struct Node final
     Value value{};
     Node* next = nullptr;
 };
+
+export template<typename Value>
+class DoublyLinkedList final
+{
+private:
+    Node<Value> *_head = nullptr;
+    std::size_t _size = 0;
+
+public:
+};
