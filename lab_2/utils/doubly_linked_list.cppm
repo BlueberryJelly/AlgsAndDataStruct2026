@@ -5,9 +5,9 @@ import std;
 export template<typename Value>
 struct Node final
 {
-    Node* previous = nullptr;
+    Node *previous = nullptr;
     Value value{};
-    Node* next = nullptr;
+    Node *next = nullptr;
 };
 
 export template<typename Value>
@@ -21,7 +21,7 @@ private:
     {
         while (_head != nullptr)
         {
-            Node<Value>* tmp = _head;
+            Node<Value> *tmp = _head;
             _head = _head->next;
             delete tmp;
         }
@@ -78,7 +78,7 @@ public:
         other._size = 0;
     }
 
-    DoublyLinkedList<Value>& operator=(const DoublyLinkedList<Value>& other)
+    DoublyLinkedList<Value>& operator=(const DoublyLinkedList<Value> &other)
     {
         if (this != &other)
         {
