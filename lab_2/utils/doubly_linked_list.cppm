@@ -79,4 +79,8 @@ public:
         }
     }
 
+    ~DoublyLinkedList() noexcept
+    {
+        free_data();
+    }
 };
