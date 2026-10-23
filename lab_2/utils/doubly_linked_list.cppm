@@ -39,9 +39,7 @@ public:
             return;
         }
 
-        _size = other._size;
         Node<Value> *other_iterator = other._head;
-
         try
         {
             Node<Value> *this_iterator = new Node<Value>();
@@ -68,9 +66,9 @@ public:
         catch(...)
         {
             free_data();
-            _size = 0;
             throw;
         }
+        _size = other._size;
     }
 
     DoublyLinkedList(DoublyLinkedList<Value> &&other) noexcept
