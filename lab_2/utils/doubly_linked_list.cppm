@@ -80,6 +80,30 @@ public:
         other._size = 0;
     }
 
+    DoublyLinkedList<Value>& operator=(const DoublyLinkedList<Value>& other)
+    {
+        if (this != &other)
+        {
+            DoublyLinkedList<Value> tmp(other);
+            *this = std::move(tmp);
+        }
+
+        return *this;
+    }
+
+    DoublyLinkedList<Value>& operator=(DoublyLinkedList<Value> &&other) noexcept
+    {
+        if (this != &other)
+        {
+            free_data();
+            _head = other._head;
+            other._head = nullptr;
+            _size = other._size;
+            other._size = 0;
+        }
+
+        return *this;
+    }
 
     ~DoublyLinkedList() noexcept
     {
