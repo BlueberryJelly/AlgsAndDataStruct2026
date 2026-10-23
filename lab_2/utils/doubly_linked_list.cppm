@@ -5,9 +5,9 @@ import std;
 export template<typename Value>
 struct Node final
 {
-    Node *previous = nullptr;
+    Node<Value> *previous = nullptr;
     Value value{};
-    Node *next = nullptr;
+    Node<Value> *next = nullptr;
 };
 
 export template<typename Value>
