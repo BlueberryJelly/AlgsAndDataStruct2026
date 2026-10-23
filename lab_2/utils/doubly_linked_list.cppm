@@ -27,13 +27,6 @@ private:
         }
     }
 
-    void free_list() noexcept
-    {
-        free_data();
-        _head = nullptr;
-        _size = 0;
-    }
-
 public:
     DoublyLinkedList() noexcept = default;
 
@@ -74,7 +67,8 @@ public:
         }
         catch(...)
         {
-            free_list();
+            free_data();
+            _size = 0;
             throw;
         }
     }
