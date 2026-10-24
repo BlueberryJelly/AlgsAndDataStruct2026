@@ -44,27 +44,27 @@ public:
     {
         if (other.head_ == nullptr) return;
 
-        Node<T> *this_current = nullptr;
-        Node<T> *this_previous = nullptr;
+        Node<T> *current = nullptr;
+        Node<T> *previous = nullptr;
         try
         {
             for(const Node<T> *other_iterator = other.head_; 
                 other_iterator != nullptr; 
                 other_iterator = other_iterator->next_)
                 {
-                this_current = new Node<T>(other_iterator->value_);
-                this_current->previous_ = this_previous;
-                if (this_previous == nullptr)
+                current = new Node<T>(other_iterator->value_);
+                current->previous_ = previous;
+                if (previous == nullptr)
                 {
-                    head_ = this_current;
+                    head_ = current;
                 }
                 else
                 {
-                    this_previous->next_ = this_current;
+                    previous->next_ = current;
                 }
-                this_previous = this_current;
+                previous = current;
             }
-            tail_ = this_previous;
+            tail_ = previous;
         }
         catch(...)
         {
