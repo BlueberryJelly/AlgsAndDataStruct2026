@@ -162,4 +162,24 @@ public:
         other.tail_ = nullptr;
         other.size_ = 0;
     }
+
+    void pop_tail() noexcept
+    {
+        if (head_ == nullptr) return;
+
+        tail_ = tail_->previous_;
+
+        if (tail_ == nullptr)
+        {
+            delete head_;
+            head_ = nullptr; 
+        }
+        else
+        {
+            delete tail_->next_;
+            tail_->next_ = nullptr;
+        }
+        
+        --size_;
+    }
 };
