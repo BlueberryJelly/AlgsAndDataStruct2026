@@ -51,7 +51,7 @@ public:
             for(const Node<T> *other_iterator = other.head_; 
                 other_iterator != nullptr; 
                 other_iterator = other_iterator->next_)
-                {
+            {
                 current = new Node<T>(other_iterator->value_);
                 current->previous_ = previous;
                 if (previous == nullptr)
@@ -130,7 +130,7 @@ public:
             tail_->next_ = new_node;
             new_node->previous_ = tail_;
         }
-        
+
         tail_ = new_node;
         ++size_;
     }
@@ -181,7 +181,7 @@ public:
             delete tail_->next_;
             tail_->next_ = nullptr;
         }
-        
+
         --size_;
     }
 
@@ -255,6 +255,46 @@ public:
 
         --size_;
     }
+
+    void delete_node(const T &value)
+    {
+        Node<T> *iterator = head_;
+
+        while(iterator != nullptr)
+        {
+            if (iterator->value_ == value)
+            {
+                Node<T> *tmp = iterator;
+                iterator = iterator->next_;
+
+                if (tmp->previous_ != nullptr)
+                {
+                    tmp->previous_->next_ = tmp->next_;
+                }
+                else
+                {
+                    head_ = tmp->next_;
+                }
+                
+                if (tmp->next_ != nullptr)
+                {
+                    tmp->next_->previous_ = tmp->previous_;
+                }
+                else
+                {
+                    tail_ = tmp->previous_;
+                }
+
+                delete tmp;
+                --size_;
+            }
+            else
+            {
+                iterator = iterator->next_;
+            }
+        }
+    }
+
     const T& operator[](std::size_t index) const
     {
         if (index >= size_)
