@@ -235,4 +235,24 @@ public:
         other.tail_ = nullptr;
         other.size_ = 0;
     }
+
+    void pop_head() noexcept
+    {
+        if (head_ == nullptr) return;
+
+        head_ = head_->next_;
+
+        if (head_ == nullptr)
+        {
+            delete tail_;
+            tail_ = nullptr;
+        }
+        else
+        {
+            delete head_->previous_;
+            head_->previous_ = nullptr;
+        }
+
+        --size_;
+    }
 };
