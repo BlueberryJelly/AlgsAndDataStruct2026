@@ -1,6 +1,7 @@
 export module doubly_linked_list;
 
 import std;
+import random_generator
 
 template<typename T>
 struct Node final
@@ -37,7 +38,20 @@ public:
 
     DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size)
     {
-
+        try
+        {
+            for(std::size_t iteration = 0; iteration < size; ++iteration)
+            {
+                push_tail(random_utils::generate_random<T>(min_value, max_value));
+            }
+        }
+        catch(...)
+        {
+            free_data();
+            tail_ = nullptr;
+            size_ = 0;
+            throw;
+        }
     }
 
     DoublyLinkedList(const DoublyLinkedList<T> &other)
