@@ -132,4 +132,34 @@ public:
         tail_ = new_node;
         ++size_;
     }
+
+    void push_tail(const DoublyLinkedList<T> &other)
+    {
+        if (this == &other || other.head_ == nullptr) return;
+
+        DoublyLinkedList<T> tmp(other);
+        push_tail(std::move(tmp));
+    }
+
+    void push_tail(DoublyLinkedList<T> &&other) noexcept
+    {
+        if (this == &other || other.head_ == nullptr) return;
+
+        if (head_ == nullptr)
+        {
+            head_ = other.head_;
+        }
+        else
+        {
+            other.head_->previous_ = tail_;
+            tail_->next_ = other.head_;
+        }
+
+        tail_ = other.tail_;
+        size_ += other.size_;
+
+        other.head_ = nullptr;
+        other.tail_ = nullptr;
+        other.size_ = 0;
+    }
 };
