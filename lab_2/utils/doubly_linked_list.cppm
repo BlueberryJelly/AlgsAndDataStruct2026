@@ -255,4 +255,42 @@ public:
 
         --size_;
     }
+    const T& operator[](std::size_t index) const
+    {
+        if (index >= size_)
+        {
+            throw std::out_of_range("Index out of list.");
+        }
+        
+        const Node<T> *iterator;
+
+        if (index > size_ / 2)
+        {
+            iterator = tail_;
+            index = size_ - 1 - index;
+
+            while(index)
+            {
+                iterator = iterator->previous_;
+                --index;
+            }
+        }
+        else
+        {
+            iterator = head_;
+
+            while(index)
+            {
+                iterator = iterator->next_;
+                --index;
+            }
+        }
+
+        return iterator->value_;
+    }
+
+    T& operator[](std::size_t index)
+    {
+        return const_cast<T&>(std::as_const(*this)[index]);
+    }
 };
