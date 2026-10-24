@@ -9,4 +9,5 @@ function(add_cpp_module_library TARGET_NAME MODULE_FILE)
     )
 endfunction()
 
+add_cpp_module_library(random_generator random_generator.cppm)
 add_cpp_module_library(doubly_linked_list doubly_linked_list.cppm)
