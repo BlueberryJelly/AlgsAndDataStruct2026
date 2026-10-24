@@ -16,10 +16,10 @@ export namespace random_utils
             return generator;
         }
 
-        template<typename T>
+        template <typename T>
         struct random_generator_traits;
 
-        template<std::integral T>
+        template <std::integral T>
         struct random_generator_traits<T>
         {
             static T generate(const T &min_value, const T &max_value)
@@ -29,7 +29,7 @@ export namespace random_utils
             }
         };
 
-        template<std::floating_point T>
+        template <std::floating_point T>
         struct random_generator_traits<T>
         {
             static T generate(const T &min_value, const T &max_value)
@@ -40,7 +40,7 @@ export namespace random_utils
         };
     }
 
-    template<typename T>
+    template <typename T>
     T generate_random(const T &min_value, const T &max_value)
     {
         return detail::random_generator_traits<T>::generate(min_value, max_value);

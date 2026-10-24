@@ -3,7 +3,7 @@ export module doubly_linked_list;
 import std;
 import random_generator;
 
-template<typename T>
+template <typename T>
 struct Node final
 {
     Node<T> *previous_ = nullptr;
@@ -15,7 +15,7 @@ struct Node final
     explicit Node(T &&value) : value_(std::move(value)) {}
 };
 
-export template<typename T>
+export template <typename T>
 class DoublyLinkedList final
 {
 private:
@@ -40,12 +40,12 @@ public:
     {
         try
         {
-            for(std::size_t iteration = 0; iteration < size; ++iteration)
+            for (std::size_t iteration = 0; iteration < size; ++iteration)
             {
                 push_tail(random_utils::generate_random<T>(min_value, max_value));
             }
         }
-        catch(...)
+        catch (...)
         {
             free_data();
             tail_ = nullptr;
@@ -60,14 +60,16 @@ public:
 
         Node<T> *current = nullptr;
         Node<T> *previous = nullptr;
+
         try
         {
-            for(const Node<T> *other_iterator = other.head_; 
-                other_iterator != nullptr; 
-                other_iterator = other_iterator->next_)
+            for (const Node<T> *other_iterator = other.head_;
+                 other_iterator != nullptr;
+                 other_iterator = other_iterator->next_)
             {
                 current = new Node<T>(other_iterator->value_);
                 current->previous_ = previous;
+
                 if (previous == nullptr)
                 {
                     head_ = current;
@@ -76,27 +78,30 @@ public:
                 {
                     previous->next_ = current;
                 }
+
                 previous = current;
             }
+
             tail_ = previous;
         }
-        catch(...)
+        catch (...)
         {
             free_data();
             throw;
         }
+
         size_ = other.size_;
     }
 
     DoublyLinkedList(DoublyLinkedList<T> &&other) noexcept
-     : head_(other.head_), tail_(other.tail_), size_(other.size_)
+        : head_(other.head_), tail_(other.tail_), size_(other.size_)
     {
         other.head_ = nullptr;
         other.tail_ = nullptr;
         other.size_ = 0;
     }
 
-    DoublyLinkedList<T>& operator=(const DoublyLinkedList<T> &other)
+    DoublyLinkedList<T> &operator=(const DoublyLinkedList<T> &other)
     {
         if (this != &other)
         {
@@ -107,7 +112,7 @@ public:
         return *this;
     }
 
-    DoublyLinkedList<T>& operator=(DoublyLinkedList<T> &&other) noexcept
+    DoublyLinkedList<T> &operator=(DoublyLinkedList<T> &&other) noexcept
     {
         if (this != &other)
         {
@@ -128,9 +133,9 @@ public:
         free_data();
     }
 
-    template<typename U>
-        requires std::constructible_from<T, U&&> &&
-             !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>
+    template <typename U>
+        requires (std::constructible_from<T, U &&> &&
+            !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
     void push_tail(U &&value)
     {
         Node<T> *new_node = new Node<T>(std::forward<U>(value));
@@ -188,7 +193,7 @@ public:
         if (tail_ == nullptr)
         {
             delete head_;
-            head_ = nullptr; 
+            head_ = nullptr;
         }
         else
         {
@@ -199,9 +204,9 @@ public:
         --size_;
     }
 
-    template<typename U>
-        requires std::constructible_from<T, U&&> &&
-             !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>
+    template <typename U>
+        requires (std::constructible_from<T, U &&> &&
+            !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
     void push_head(U &&value)
     {
         Node<T> *new_node = new Node<T>(std::forward<U>(value));
@@ -274,7 +279,7 @@ public:
     {
         Node<T> *current = head_;
 
-        while(current != nullptr)
+        while (current != nullptr)
         {
             if (current->value_ == value)
             {
@@ -289,7 +294,7 @@ public:
                 {
                     head_ = tmp->next_;
                 }
-                
+
                 if (tmp->next_ != nullptr)
                 {
                     tmp->next_->previous_ = tmp->previous_;
@@ -309,13 +314,13 @@ public:
         }
     }
 
-    const T& operator[](std::size_t index) const
+    const T &operator[](std::size_t index) const
     {
         if (index >= size_)
         {
             throw std::out_of_range("Index out of list.");
         }
-        
+
         const Node<T> *current;
 
         if (index > size_ / 2)
@@ -323,7 +328,7 @@ public:
             current = tail_;
             index = size_ - 1 - index;
 
-            while(index > 0)
+            while (index > 0)
             {
                 current = current->previous_;
                 --index;
@@ -333,7 +338,7 @@ public:
         {
             current = head_;
 
-            while(index > 0)
+            while (index > 0)
             {
                 current = current->next_;
                 --index;
@@ -343,16 +348,16 @@ public:
         return current->value_;
     }
 
-    T& operator[](std::size_t index)
+    T &operator[](std::size_t index)
     {
-        return const_cast<T&>(std::as_const(*this)[index]);
+        return const_cast<T &>(std::as_const(*this)[index]);
     }
 
-    template<typename U>
-    friend std::ostream& operator<<(std::ostream &, const DoublyLinkedList<U> &);
+    template <typename U>
+    friend std::ostream &operator<<(std::ostream &, const DoublyLinkedList<U> &);
 };
 
-template<typename T>
+template <typename T>
 std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
 {
     const Node<T> *current = list.head_;
@@ -363,7 +368,7 @@ std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
         current = current->next_;
     }
 
-    while(current != nullptr)
+    while (current != nullptr)
     {
         os << ", " << current->value_;
         current = current->next_;
