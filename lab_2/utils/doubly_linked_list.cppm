@@ -2,27 +2,32 @@ export module doubly_linked_list;
 
 import std;
 
-export template<typename Value>
+template<typename T>
 struct Node final
 {
-    Node<Value> *previous = nullptr;
-    Value value{};
-    Node<Value> *next = nullptr;
+    Node<T> *previous_ = nullptr;
+    Node<T> *next_ = nullptr;
+    T value_;
+
+    explicit Node(const T &value) : value_(value) {}
+
+    explicit Node(T &&value) : value_(std::move(value)) {}
 };
 
-export template<typename Value>
+export template<typename T>
 class DoublyLinkedList final
 {
 private:
-    Node<Value> *_head = nullptr;
-    std::size_t _size = 0;
+    Node<T> *head_ = nullptr;
+    Node<T> *tail_ = nullptr;
+    std::size_t size_ = 0;
 
     void free_data() noexcept
     {
-        while (_head != nullptr)
+        while (head_ != nullptr)
         {
-            Node<Value> *tmp = _head;
-            _head = _head->next;
+            Node<T> *tmp = head_;
+            head_ = head_->next_;
             delete tmp;
         }
     }
@@ -30,74 +35,75 @@ private:
 public:
     DoublyLinkedList() noexcept = default;
 
-    DoublyLinkedList(const DoublyLinkedList<Value> &other)
+    DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size)
     {
-        if (other._head == nullptr)
-        {
-            _head = nullptr;
-            _size = 0;
-            return;
-        }
 
-        Node<Value> *other_iterator = other._head;
+    }
+
+    DoublyLinkedList(const DoublyLinkedList<T> &other)
+    {
+        if (other.head_ == nullptr) return;
+
+        Node<T> *this_current = nullptr;
+        Node<T> *this_previous = nullptr;
         try
         {
-            Node<Value> *this_iterator = new Node<Value>();
-            _head = this_iterator;
-            this_iterator->previous = nullptr;
-            while(other_iterator != nullptr)
-            {
-                this_iterator->value = other_iterator->value;
-
-                if (other_iterator->next != nullptr)
+            for(const Node<T> *other_iterator = other.head_; 
+                other_iterator != nullptr; 
+                other_iterator = other_iterator->next_)
                 {
-                    this_iterator->next = new Node<Value>();
-                    this_iterator->next->previous = this_iterator;
-                    this_iterator = this_iterator->next;
+                this_current = new Node<T>(other_iterator->value_);
+                this_current->previous_ = this_previous;
+                if (this_previous == nullptr)
+                {
+                    head_ = this_current;
                 }
                 else
                 {
-                    this_iterator->next = nullptr;
+                    this_previous->next_ = this_current;
                 }
-
-                other_iterator = other_iterator->next;
+                this_previous = this_current;
             }
+            tail_ = this_previous;
         }
         catch(...)
         {
             free_data();
             throw;
         }
-        _size = other._size;
+        size_ = other.size_;
     }
 
-    DoublyLinkedList(DoublyLinkedList<Value> &&other) noexcept
-     : _head(other._head), _size(other._size)
+    DoublyLinkedList(DoublyLinkedList<T> &&other) noexcept
+     : head_(other.head_), tail_(other.tail_), size_(other.size_)
     {
-        other._head = nullptr;
-        other._size = 0;
+        other.head_ = nullptr;
+        other.tail_ = nullptr;
+        other.size_ = 0;
     }
 
-    DoublyLinkedList<Value>& operator=(const DoublyLinkedList<Value> &other)
+    DoublyLinkedList<T>& operator=(const DoublyLinkedList<T> &other)
     {
         if (this != &other)
         {
-            DoublyLinkedList<Value> tmp(other);
+            DoublyLinkedList<T> tmp(other);
             *this = std::move(tmp);
         }
 
         return *this;
     }
 
-    DoublyLinkedList<Value>& operator=(DoublyLinkedList<Value> &&other) noexcept
+    DoublyLinkedList<T>& operator=(DoublyLinkedList<T> &&other) noexcept
     {
         if (this != &other)
         {
             free_data();
-            _head = other._head;
-            other._head = nullptr;
-            _size = other._size;
-            other._size = 0;
+            head_ = other.head_;
+            other.head_ = nullptr;
+            tail_ = other.tail_;
+            other.tail_ = nullptr;
+            size_ = other.size_;
+            other.size_ = 0;
         }
 
         return *this;
