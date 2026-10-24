@@ -182,4 +182,23 @@ public:
         
         --size_;
     }
+
+    template<typename U>
+    void push_head(U &&value)
+    {
+        Node<T> *new_node = new Node<T>(std::forward<U>(value));
+
+        if (head_ == nullptr)
+        {
+            tail_ = new_node;
+        }
+        else
+        {
+            head_->previous_ = new_node;
+            new_node->next_ = head_;
+        }
+
+        head_ = new_node;
+        ++size_;
+    }
 };
