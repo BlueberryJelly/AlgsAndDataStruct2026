@@ -347,4 +347,28 @@ public:
     {
         return const_cast<T&>(std::as_const(*this)[index]);
     }
+
+    template<typename U>
+    friend std::ostream& operator<<(std::ostream &, const DoublyLinkedList<U> &);
 };
+
+template<typename T>
+std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
+{
+    const Node<T> *current = list.head_;
+
+    if (current != nullptr)
+    {
+        os << current->value_;
+        current = current->next_;
+    }
+
+    while(current != nullptr)
+    {
+        os << ", " << current->value_;
+        current = current->next_;
+    }
+
+    os << "\n";
+    return os;
+}
