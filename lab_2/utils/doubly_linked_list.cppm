@@ -1,7 +1,7 @@
 export module doubly_linked_list;
 
 import std;
-import random_generator
+import random_generator;
 
 template<typename T>
 struct Node final
@@ -272,14 +272,14 @@ public:
 
     void delete_node(const T &value)
     {
-        Node<T> *iterator = head_;
+        Node<T> *current = head_;
 
-        while(iterator != nullptr)
+        while(current != nullptr)
         {
-            if (iterator->value_ == value)
+            if (current->value_ == value)
             {
-                Node<T> *tmp = iterator;
-                iterator = iterator->next_;
+                Node<T> *tmp = current;
+                current = current->next_;
 
                 if (tmp->previous_ != nullptr)
                 {
@@ -304,7 +304,7 @@ public:
             }
             else
             {
-                iterator = iterator->next_;
+                current = current->next_;
             }
         }
     }
@@ -316,31 +316,31 @@ public:
             throw std::out_of_range("Index out of list.");
         }
         
-        const Node<T> *iterator;
+        const Node<T> *current;
 
         if (index > size_ / 2)
         {
-            iterator = tail_;
+            current = tail_;
             index = size_ - 1 - index;
 
             while(index > 0)
             {
-                iterator = iterator->previous_;
+                current = current->previous_;
                 --index;
             }
         }
         else
         {
-            iterator = head_;
+            current = head_;
 
             while(index > 0)
             {
-                iterator = iterator->next_;
+                current = current->next_;
                 --index;
             }
         }
 
-        return iterator->value_;
+        return current->value_;
     }
 
     T& operator[](std::size_t index)
