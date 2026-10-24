@@ -309,7 +309,7 @@ public:
             iterator = tail_;
             index = size_ - 1 - index;
 
-            while(index)
+            while(index > 0)
             {
                 iterator = iterator->previous_;
                 --index;
@@ -319,7 +319,7 @@ public:
         {
             iterator = head_;
 
-            while(index)
+            while(index > 0)
             {
                 iterator = iterator->next_;
                 --index;
