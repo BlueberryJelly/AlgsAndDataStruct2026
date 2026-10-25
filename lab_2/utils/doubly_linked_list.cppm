@@ -227,22 +227,14 @@ public:
 
     void pop_head() noexcept
     {
-        if (head_ == nullptr)
+        if (empty())
             return;
 
-        head_ = head_->next_;
+        NodeBase *tmp = sentinel_.next_;
+        sentinel_.next_ = tmp->next_;
+        tmp->next_->previous_ = &sentinel_;
 
-        if (head_ == nullptr)
-        {
-            delete tail_;
-            tail_ = nullptr;
-        }
-        else
-        {
-            delete head_->previous_;
-            head_->previous_ = nullptr;
-        }
-
+        delete static_cast<Node<T> *>(tmp);
         --size_;
     }
 
