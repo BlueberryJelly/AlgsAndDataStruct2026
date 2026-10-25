@@ -131,17 +131,12 @@ public:
     {
         Node<T> *new_node = new Node<T>(std::forward<U>(value));
 
-        if (head_ == nullptr)
-        {
-            head_ = new_node;
-        }
-        else
-        {
-            tail_->next_ = new_node;
-            new_node->previous_ = tail_;
-        }
+        new_node->previous_ = sentinel_.previous_;
+        new_node->next_ = &sentinel_;
 
-        tail_ = new_node;
+        sentinel_.previous_->next_ = new_node;
+        sentinel_.previous_ = new_node;
+
         ++size_;
     }
 
