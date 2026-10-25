@@ -3,15 +3,18 @@ export module doubly_linked_list;
 import std;
 import random_generator;
 
-template <typename T>
-struct Node final
+struct NodeBase
 {
-    Node<T> *previous_ = nullptr;
-    Node<T> *next_ = nullptr;
+    NodeBase *previous_ = nullptr;
+    NodeBase *next_ = nullptr;
+};
+
+template <typename T>
+struct Node final : public NodeBase
+{
     T value_;
 
     explicit Node(const T &value) : value_(value) {}
-
     explicit Node(T &&value) : value_(std::move(value)) {}
 };
 
@@ -19,24 +22,30 @@ export template <typename T>
 class DoublyLinkedList final
 {
 private:
-    Node<T> *head_ = nullptr;
-    Node<T> *tail_ = nullptr;
+    NodeBase sentinel_;
     std::size_t size_ = 0;
+
+    bool empty() const noexcept
+    {
+        return sentinel_.next_ == &sentinel_;
+    }
 
     void free_data() noexcept
     {
-        while (head_ != nullptr)
+        while (!empty())
         {
-            Node<T> *tmp = head_;
-            head_ = head_->next_;
-            delete tmp;
+            pop_tail();
         }
     }
 
 public:
-    DoublyLinkedList() noexcept = default;
+    DoublyLinkedList() noexcept
+    {
+        sentinel_.next_ = &sentinel_;
+        sentinel_.previous_ = &sentinel_;
+    }
 
-    DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size)
+    DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size) : DoublyLinkedList()
     {
         try
         {
@@ -48,58 +57,33 @@ public:
         catch (...)
         {
             free_data();
-            tail_ = nullptr;
-            size_ = 0;
             throw;
         }
     }
 
-    DoublyLinkedList(const DoublyLinkedList<T> &other)
+    DoublyLinkedList(const DoublyLinkedList<T> &other) : DoublyLinkedList()
     {
-        if (other.head_ == nullptr)
-            return;
-
-        Node<T> *current = nullptr;
-        Node<T> *previous = nullptr;
-
-        try
+        for (const NodeBase *curr = other.sentinel_.next_; curr != &other.sentinel_; curr = curr->next_)
         {
-            for (const Node<T> *other_iterator = other.head_;
-                 other_iterator != nullptr;
-                 other_iterator = other_iterator->next_)
-            {
-                current = new Node<T>(other_iterator->value_);
-                current->previous_ = previous;
-
-                if (previous == nullptr)
-                {
-                    head_ = current;
-                }
-                else
-                {
-                    previous->next_ = current;
-                }
-
-                previous = current;
-            }
-
-            tail_ = previous;
+            push_tail(static_cast<const Node<T> *>(curr)->value_);
         }
-        catch (...)
-        {
-            free_data();
-            throw;
-        }
-
-        size_ = other.size_;
     }
 
-    DoublyLinkedList(DoublyLinkedList<T> &&other) noexcept
-        : head_(other.head_), tail_(other.tail_), size_(other.size_)
+    DoublyLinkedList(DoublyLinkedList<T> &&other) noexcept : DoublyLinkedList()
     {
-        other.head_ = nullptr;
-        other.tail_ = nullptr;
-        other.size_ = 0;
+        if (!other.empty())
+        {
+            sentinel_.next_ = other.sentinel_.next_;
+            sentinel_.previous_ = other.sentinel_.previous_;
+            size_ = other.size_;
+
+            sentinel_.next_->previous_ = &sentinel_;
+            sentinel_.previous_->next_ = &sentinel_;
+
+            other.sentinel_.next_ = &other.sentinel_;
+            other.sentinel_.previous_ = &other.sentinel_;
+            other.size_ = 0;
+        }
     }
 
     DoublyLinkedList<T> &operator=(const DoublyLinkedList<T> &other)
@@ -109,7 +93,6 @@ public:
             DoublyLinkedList<T> tmp(other);
             *this = std::move(tmp);
         }
-
         return *this;
     }
 
@@ -118,14 +101,21 @@ public:
         if (this != &other)
         {
             free_data();
-            head_ = other.head_;
-            other.head_ = nullptr;
-            tail_ = other.tail_;
-            other.tail_ = nullptr;
-            size_ = other.size_;
-            other.size_ = 0;
-        }
 
+            if (!other.empty())
+            {
+                sentinel_.next_ = other.sentinel_.next_;
+                sentinel_.previous_ = other.sentinel_.previous_;
+                size_ = other.size_;
+
+                sentinel_.next_->previous_ = &sentinel_;
+                sentinel_.previous_->next_ = &sentinel_;
+
+                other.sentinel_.next_ = &other.sentinel_;
+                other.sentinel_.previous_ = &other.sentinel_;
+                other.size_ = 0;
+            }
+        }
         return *this;
     }
 
@@ -141,70 +131,53 @@ public:
     {
         Node<T> *new_node = new Node<T>(std::forward<U>(value));
 
-        if (head_ == nullptr)
-        {
-            head_ = new_node;
-        }
-        else
-        {
-            tail_->next_ = new_node;
-            new_node->previous_ = tail_;
-        }
+        new_node->previous_ = sentinel_.previous_;
+        new_node->next_ = &sentinel_;
 
-        tail_ = new_node;
+        sentinel_.previous_->next_ = new_node;
+        sentinel_.previous_ = new_node;
+
         ++size_;
     }
 
     void push_tail(const DoublyLinkedList<T> &other)
     {
-        if (this == &other || other.head_ == nullptr)
+        if (this == &other || other.empty())
             return;
-
         DoublyLinkedList<T> tmp(other);
         push_tail(std::move(tmp));
     }
 
     void push_tail(DoublyLinkedList<T> &&other) noexcept
     {
-        if (this == &other || other.head_ == nullptr)
+        if (this == &other || other.empty())
             return;
 
-        if (head_ == nullptr)
-        {
-            head_ = other.head_;
-        }
-        else
-        {
-            other.head_->previous_ = tail_;
-            tail_->next_ = other.head_;
-        }
+        NodeBase *other_first = other.sentinel_.next_;
+        NodeBase *other_last = other.sentinel_.previous_;
 
-        tail_ = other.tail_;
+        other_last->next_ = &sentinel_;
+        sentinel_.previous_->next_ = other_first;
+        other_first->previous_ = sentinel_.previous_;
+        sentinel_.previous_ = other_last;
+
         size_ += other.size_;
 
-        other.head_ = nullptr;
-        other.tail_ = nullptr;
+        other.sentinel_.next_ = &other.sentinel_;
+        other.sentinel_.previous_ = &other.sentinel_;
         other.size_ = 0;
     }
 
     void pop_tail() noexcept
     {
-        if (head_ == nullptr)
+        if (empty())
             return;
 
-        tail_ = tail_->previous_;
+        NodeBase *tmp = sentinel_.previous_;
+        sentinel_.previous_ = tmp->previous_;
+        tmp->previous_->next_ = &sentinel_;
 
-        if (tail_ == nullptr)
-        {
-            delete head_;
-            head_ = nullptr;
-        }
-        else
-        {
-            delete tail_->next_;
-            tail_->next_ = nullptr;
-        }
-
+        delete static_cast<Node<T> *>(tmp);
         --size_;
     }
 
@@ -215,109 +188,72 @@ public:
     {
         Node<T> *new_node = new Node<T>(std::forward<U>(value));
 
-        if (head_ == nullptr)
-        {
-            tail_ = new_node;
-        }
-        else
-        {
-            head_->previous_ = new_node;
-            new_node->next_ = head_;
-        }
+        new_node->next_ = sentinel_.next_;
+        new_node->previous_ = &sentinel_;
 
-        head_ = new_node;
+        sentinel_.next_->previous_ = new_node;
+        sentinel_.next_ = new_node;
+
         ++size_;
     }
 
     void push_head(const DoublyLinkedList<T> &other)
     {
-        if (this == &other || other.head_ == nullptr)
+        if (this == &other || other.empty())
             return;
-
         DoublyLinkedList<T> tmp(other);
         push_head(std::move(tmp));
     }
 
     void push_head(DoublyLinkedList<T> &&other) noexcept
     {
-        if (this == &other || other.head_ == nullptr)
+        if (this == &other || other.empty())
             return;
 
-        if (head_ == nullptr)
-        {
-            tail_ = other.tail_;
-        }
-        else
-        {
-            other.tail_->next_ = head_;
-            head_->previous_ = other.tail_;
-        }
+        NodeBase *other_first = other.sentinel_.next_;
+        NodeBase *other_last = other.sentinel_.previous_;
 
-        head_ = other.head_;
+        other_first->previous_ = &sentinel_;
+        sentinel_.next_->previous_ = other_last;
+        other_last->next_ = sentinel_.next_;
+        sentinel_.next_ = other_first;
+
         size_ += other.size_;
 
-        other.head_ = nullptr;
-        other.tail_ = nullptr;
+        other.sentinel_.next_ = &other.sentinel_;
+        other.sentinel_.previous_ = &other.sentinel_;
         other.size_ = 0;
     }
 
     void pop_head() noexcept
     {
-        if (head_ == nullptr)
+        if (empty())
             return;
 
-        head_ = head_->next_;
+        NodeBase *tmp = sentinel_.next_;
+        sentinel_.next_ = tmp->next_;
+        tmp->next_->previous_ = &sentinel_;
 
-        if (head_ == nullptr)
-        {
-            delete tail_;
-            tail_ = nullptr;
-        }
-        else
-        {
-            delete head_->previous_;
-            head_->previous_ = nullptr;
-        }
-
+        delete static_cast<Node<T> *>(tmp);
         --size_;
     }
 
     void delete_node(const T &value)
     {
-        Node<T> *current = head_;
-
-        while (current != nullptr)
+        NodeBase *current = sentinel_.next_;
+        while (current != &sentinel_)
         {
-            if (current->value_ == value)
+            Node<T> *node = static_cast<Node<T> *>(current);
+            NodeBase *next_node = current->next_;
+
+            if (node->value_ == value)
             {
-                Node<T> *tmp = current;
-                current = current->next_;
-
-                if (tmp->previous_ != nullptr)
-                {
-                    tmp->previous_->next_ = tmp->next_;
-                }
-                else
-                {
-                    head_ = tmp->next_;
-                }
-
-                if (tmp->next_ != nullptr)
-                {
-                    tmp->next_->previous_ = tmp->previous_;
-                }
-                else
-                {
-                    tail_ = tmp->previous_;
-                }
-
-                delete tmp;
+                current->previous_->next_ = current->next_;
+                current->next_->previous_ = current->previous_;
+                delete node;
                 --size_;
             }
-            else
-            {
-                current = current->next_;
-            }
+            current = next_node;
         }
     }
 
@@ -328,31 +264,22 @@ public:
             throw std::out_of_range("Index out of list.");
         }
 
-        const Node<T> *current;
+        const NodeBase *current;
 
-        if (index > size_ / 2)
+        if (index < size_ / 2)
         {
-            current = tail_;
-            index = size_ - 1 - index;
-
-            while (index > 0)
-            {
-                current = current->previous_;
-                --index;
-            }
+            current = sentinel_.next_;
+            for (std::size_t i = 0; i < index; ++i)
+                current = current->next_;
         }
         else
         {
-            current = head_;
-
-            while (index > 0)
-            {
-                current = current->next_;
-                --index;
-            }
+            current = sentinel_.previous_;
+            for (std::size_t i = size_ - 1; i > index; --i)
+                current = current->previous_;
         }
 
-        return current->value_;
+        return static_cast<const Node<T> *>(current)->value_;
     }
 
     T &operator[](std::size_t index)
@@ -367,17 +294,17 @@ public:
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
 {
-    const Node<T> *current = list.head_;
+    const NodeBase *current = list.sentinel_.next_;
 
-    if (current != nullptr)
+    if (current != &list.sentinel_)
     {
-        os << current->value_;
+        os << static_cast<const Node<T> *>(current)->value_;
         current = current->next_;
     }
 
-    while (current != nullptr)
+    while (current != &list.sentinel_)
     {
-        os << ", " << current->value_;
+        os << ", " << static_cast<const Node<T> *>(current)->value_;
         current = current->next_;
     }
 
