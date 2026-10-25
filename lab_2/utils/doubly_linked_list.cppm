@@ -204,16 +204,15 @@ public:
     {
         if (!other.empty())
         {
-            sentinel_.next_ = other.sentinel_.next_;
             sentinel_.previous_ = other.sentinel_.previous_;
-            size_ = other.size_;
-
-            sentinel_.next_->previous_ = &sentinel_;
-            sentinel_.previous_->next_ = &sentinel_;
-
-            other.sentinel_.next_ = &other.sentinel_;
             other.sentinel_.previous_ = &other.sentinel_;
+            sentinel_.next_ = other.sentinel_.next_;
+            other.sentinel_.next_ = &other.sentinel_;
+            size_ = other.size_;
             other.size_ = 0;
+
+            sentinel_.previous_->next_ = &sentinel_;
+            sentinel_.next_->previous_ = &sentinel_;
         }
     }
 
