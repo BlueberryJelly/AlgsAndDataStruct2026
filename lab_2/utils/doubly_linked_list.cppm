@@ -240,40 +240,20 @@ public:
 
     void delete_node(const T &value)
     {
-        Node<T> *current = head_;
-
-        while (current != nullptr)
+        NodeBase *current = sentinel_.next_;
+        while (current != &sentinel_)
         {
-            if (current->value_ == value)
+            Node<T> *node = static_cast<Node<T> *>(current);
+            NodeBase *next_node = current->next_;
+
+            if (node->value_ == value)
             {
-                Node<T> *tmp = current;
-                current = current->next_;
-
-                if (tmp->previous_ != nullptr)
-                {
-                    tmp->previous_->next_ = tmp->next_;
-                }
-                else
-                {
-                    head_ = tmp->next_;
-                }
-
-                if (tmp->next_ != nullptr)
-                {
-                    tmp->next_->previous_ = tmp->previous_;
-                }
-                else
-                {
-                    tail_ = tmp->previous_;
-                }
-
-                delete tmp;
+                current->previous_->next_ = current->next_;
+                current->next_->previous_ = current->previous_;
+                delete node;
                 --size_;
             }
-            else
-            {
-                current = current->next_;
-            }
+            current = next_node;
         }
     }
 
