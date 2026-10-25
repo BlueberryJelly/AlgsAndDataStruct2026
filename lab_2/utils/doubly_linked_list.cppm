@@ -136,7 +136,7 @@ public:
 
     template <typename U>
         requires(std::constructible_from<T, U &&> &&
-            !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
+                 !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
     void push_tail(U &&value)
     {
         Node<T> *new_node = new Node<T>(std::forward<U>(value));
@@ -210,7 +210,7 @@ public:
 
     template <typename U>
         requires(std::constructible_from<T, U &&> &&
-            !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
+                 !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
     void push_head(U &&value)
     {
         Node<T> *new_node = new Node<T>(std::forward<U>(value));
