@@ -280,16 +280,15 @@ public:
 
     void push_tail(const DoublyLinkedList<T> &other)
     {
-        if (this == &other || other.empty())
-            return;
+        if (this == &other || other.empty()) return;
+        
         DoublyLinkedList<T> tmp(other);
         push_tail(std::move(tmp));
     }
 
     void push_tail(DoublyLinkedList<T> &&other) noexcept
     {
-        if (this == &other || other.empty())
-            return;
+        if (this == &other || other.empty()) return;
 
         NodeBase *other_first = other.sentinel_.next_;
         NodeBase *other_last = other.sentinel_.previous_;
@@ -308,8 +307,7 @@ public:
 
     void pop_tail() noexcept
     {
-        if (empty())
-            return;
+        if (empty()) return;
 
         NodeBase *tmp = sentinel_.previous_;
         sentinel_.previous_ = tmp->previous_;
@@ -337,16 +335,15 @@ public:
 
     void push_head(const DoublyLinkedList<T> &other)
     {
-        if (this == &other || other.empty())
-            return;
+        if (this == &other || other.empty()) return;
+
         DoublyLinkedList<T> tmp(other);
         push_head(std::move(tmp));
     }
 
     void push_head(DoublyLinkedList<T> &&other) noexcept
     {
-        if (this == &other || other.empty())
-            return;
+        if (this == &other || other.empty()) return;
 
         NodeBase *other_first = other.sentinel_.next_;
         NodeBase *other_last = other.sentinel_.previous_;
@@ -365,8 +362,7 @@ public:
 
     void pop_head() noexcept
     {
-        if (empty())
-            return;
+        if (empty()) return;
 
         NodeBase *tmp = sentinel_.next_;
         sentinel_.next_ = tmp->next_;
@@ -379,6 +375,7 @@ public:
     void delete_node(const T &value)
     {
         NodeBase *current = sentinel_.next_;
+
         while (current != &sentinel_)
         {
             Node<T> *node = static_cast<Node<T> *>(current);
@@ -391,6 +388,7 @@ public:
                 delete node;
                 --size_;
             }
+
             current = next_node;
         }
     }
@@ -407,14 +405,12 @@ public:
         if (index < size_ / 2)
         {
             current = sentinel_.next_;
-            for (std::size_t i = 0; i < index; ++i)
-                current = current->next_;
+            for (std::size_t i = 0; i < index; ++i) current = current->next_;
         }
         else
         {
             current = sentinel_.previous_;
-            for (std::size_t i = size_ - 1; i > index; --i)
-                current = current->previous_;
+            for (std::size_t i = size_ - 1; i > index; --i) current = current->previous_;
         }
 
         return static_cast<const Node<T> *>(current)->value_;
