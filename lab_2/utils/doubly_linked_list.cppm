@@ -56,7 +56,8 @@ public:
 
     DoublyLinkedList(const DoublyLinkedList<T> &other)
     {
-        if (other.head_ == nullptr) return;
+        if (other.head_ == nullptr)
+            return;
 
         Node<T> *current = nullptr;
         Node<T> *previous = nullptr;
@@ -134,7 +135,7 @@ public:
     }
 
     template <typename U>
-        requires (std::constructible_from<T, U &&> &&
+        requires(std::constructible_from<T, U &&> &&
             !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
     void push_tail(U &&value)
     {
@@ -156,7 +157,8 @@ public:
 
     void push_tail(const DoublyLinkedList<T> &other)
     {
-        if (this == &other || other.head_ == nullptr) return;
+        if (this == &other || other.head_ == nullptr)
+            return;
 
         DoublyLinkedList<T> tmp(other);
         push_tail(std::move(tmp));
@@ -164,7 +166,8 @@ public:
 
     void push_tail(DoublyLinkedList<T> &&other) noexcept
     {
-        if (this == &other || other.head_ == nullptr) return;
+        if (this == &other || other.head_ == nullptr)
+            return;
 
         if (head_ == nullptr)
         {
@@ -186,7 +189,8 @@ public:
 
     void pop_tail() noexcept
     {
-        if (head_ == nullptr) return;
+        if (head_ == nullptr)
+            return;
 
         tail_ = tail_->previous_;
 
@@ -205,7 +209,7 @@ public:
     }
 
     template <typename U>
-        requires (std::constructible_from<T, U &&> &&
+        requires(std::constructible_from<T, U &&> &&
             !std::is_same_v<std::decay_t<U>, DoublyLinkedList<T>>)
     void push_head(U &&value)
     {
@@ -227,7 +231,8 @@ public:
 
     void push_head(const DoublyLinkedList<T> &other)
     {
-        if (this == &other || other.head_ == nullptr) return;
+        if (this == &other || other.head_ == nullptr)
+            return;
 
         DoublyLinkedList<T> tmp(other);
         push_head(std::move(tmp));
@@ -235,7 +240,8 @@ public:
 
     void push_head(DoublyLinkedList<T> &&other) noexcept
     {
-        if (this == &other || other.head_ == nullptr) return;
+        if (this == &other || other.head_ == nullptr)
+            return;
 
         if (head_ == nullptr)
         {
@@ -257,7 +263,8 @@ public:
 
     void pop_head() noexcept
     {
-        if (head_ == nullptr) return;
+        if (head_ == nullptr)
+            return;
 
         head_ = head_->next_;
 
