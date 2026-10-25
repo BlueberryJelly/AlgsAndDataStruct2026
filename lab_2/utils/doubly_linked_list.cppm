@@ -172,8 +172,8 @@ private:
 public:
     DoublyLinkedList() noexcept
     {
-        sentinel_.next_ = &sentinel_;
         sentinel_.previous_ = &sentinel_;
+        sentinel_.next_ = &sentinel_;
     }
 
     DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size) : DoublyLinkedList()
