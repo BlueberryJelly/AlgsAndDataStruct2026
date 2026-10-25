@@ -170,22 +170,14 @@ public:
 
     void pop_tail() noexcept
     {
-        if (head_ == nullptr)
+        if (empty())
             return;
 
-        tail_ = tail_->previous_;
+        NodeBase *tmp = sentinel_.previous_;
+        sentinel_.previous_ = tmp->previous_;
+        tmp->previous_->next_ = &sentinel_;
 
-        if (tail_ == nullptr)
-        {
-            delete head_;
-            head_ = nullptr;
-        }
-        else
-        {
-            delete tail_->next_;
-            tail_->next_ = nullptr;
-        }
-
+        delete static_cast<Node<T> *>(tmp);
         --size_;
     }
 
