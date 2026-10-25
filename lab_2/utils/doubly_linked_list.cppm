@@ -62,12 +62,12 @@ public:
 
     const T &operator*() const noexcept
     {
-        return static_cast<const Node<T>*>(iterator_)->value_;
+        return static_cast<const Node<T> *>(iterator_)->value_;
     }
 
     const T *operator->() const noexcept
     {
-        return &(static_cast<const Node<T>*>(iterator_)->value_);
+        return &(static_cast<const Node<T> *>(iterator_)->value_);
     }
 
     bool operator==(const ConstIterator &other) const noexcept
@@ -130,12 +130,12 @@ public:
 
     T &operator*() const noexcept
     {
-        return static_cast<Node<T>*>(iterator_)->value_;
+        return static_cast<Node<T> *>(iterator_)->value_;
     }
 
     T *operator->() const noexcept
     {
-        return &(static_cast<Node<T>*>(iterator_)->value_);
+        return &(static_cast<Node<T> *>(iterator_)->value_);
     }
 
     bool operator==(const Iterator &other) const noexcept
