@@ -93,7 +93,6 @@ public:
             DoublyLinkedList<T> tmp(other);
             *this = std::move(tmp);
         }
-
         return *this;
     }
 
@@ -102,14 +101,21 @@ public:
         if (this != &other)
         {
             free_data();
-            head_ = other.head_;
-            other.head_ = nullptr;
-            tail_ = other.tail_;
-            other.tail_ = nullptr;
-            size_ = other.size_;
-            other.size_ = 0;
-        }
 
+            if (!other.empty())
+            {
+                sentinel_.next_ = other.sentinel_.next_;
+                sentinel_.previous_ = other.sentinel_.previous_;
+                size_ = other.size_;
+
+                sentinel_.next_->previous_ = &sentinel_;
+                sentinel_.previous_->next_ = &sentinel_;
+
+                other.sentinel_.next_ = &other.sentinel_;
+                other.sentinel_.previous_ = &other.sentinel_;
+                other.size_ = 0;
+            }
+        }
         return *this;
     }
 
