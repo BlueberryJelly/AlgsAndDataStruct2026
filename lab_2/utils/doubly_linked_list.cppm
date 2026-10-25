@@ -294,17 +294,17 @@ public:
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
 {
-    const Node<T> *current = list.head_;
+    const NodeBase *current = list.sentinel_.next_;
 
-    if (current != nullptr)
+    if (current != &list.sentinel_)
     {
-        os << current->value_;
+        os << static_cast<const Node<T> *>(current)->value_;
         current = current->next_;
     }
 
-    while (current != nullptr)
+    while (current != &list.sentinel_)
     {
-        os << ", " << current->value_;
+        os << ", " << static_cast<const Node<T> *>(current)->value_;
         current = current->next_;
     }
 
