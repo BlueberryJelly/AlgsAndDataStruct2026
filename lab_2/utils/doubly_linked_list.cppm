@@ -199,33 +199,29 @@ public:
 
     void push_head(const DoublyLinkedList<T> &other)
     {
-        if (this == &other || other.head_ == nullptr)
+        if (this == &other || other.empty())
             return;
-
         DoublyLinkedList<T> tmp(other);
         push_head(std::move(tmp));
     }
 
     void push_head(DoublyLinkedList<T> &&other) noexcept
     {
-        if (this == &other || other.head_ == nullptr)
+        if (this == &other || other.empty())
             return;
 
-        if (head_ == nullptr)
-        {
-            tail_ = other.tail_;
-        }
-        else
-        {
-            other.tail_->next_ = head_;
-            head_->previous_ = other.tail_;
-        }
+        NodeBase *other_first = other.sentinel_.next_;
+        NodeBase *other_last = other.sentinel_.previous_;
 
-        head_ = other.head_;
+        other_first->previous_ = &sentinel_;
+        sentinel_.next_->previous_ = other_last;
+        other_last->next_ = sentinel_.next_;
+        sentinel_.next_ = other_first;
+
         size_ += other.size_;
 
-        other.head_ = nullptr;
-        other.tail_ = nullptr;
+        other.sentinel_.next_ = &other.sentinel_;
+        other.sentinel_.previous_ = &other.sentinel_;
         other.size_ = 0;
     }
 
