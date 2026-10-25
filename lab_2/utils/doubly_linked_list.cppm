@@ -264,31 +264,22 @@ public:
             throw std::out_of_range("Index out of list.");
         }
 
-        const Node<T> *current;
+        const NodeBase *current;
 
-        if (index > size_ / 2)
+        if (index < size_ / 2)
         {
-            current = tail_;
-            index = size_ - 1 - index;
-
-            while (index > 0)
-            {
-                current = current->previous_;
-                --index;
-            }
+            current = sentinel_.next_;
+            for (std::size_t i = 0; i < index; ++i)
+                current = current->next_;
         }
         else
         {
-            current = head_;
-
-            while (index > 0)
-            {
-                current = current->next_;
-                --index;
-            }
+            current = sentinel_.previous_;
+            for (std::size_t i = size_ - 1; i > index; --i)
+                current = current->previous_;
         }
 
-        return current->value_;
+        return static_cast<const Node<T> *>(current)->value_;
     }
 
     T &operator[](std::size_t index)
