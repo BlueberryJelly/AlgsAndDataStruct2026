@@ -61,52 +61,29 @@ public:
         }
     }
 
-    DoublyLinkedList(const DoublyLinkedList<T> &other)
+    DoublyLinkedList(const DoublyLinkedList<T> &other) : DoublyLinkedList()
     {
-        if (other.head_ == nullptr)
-            return;
-
-        Node<T> *current = nullptr;
-        Node<T> *previous = nullptr;
-
-        try
+        for (const NodeBase *curr = other.sentinel_.next_; curr != &other.sentinel_; curr = curr->next_)
         {
-            for (const Node<T> *other_iterator = other.head_;
-                 other_iterator != nullptr;
-                 other_iterator = other_iterator->next_)
-            {
-                current = new Node<T>(other_iterator->value_);
-                current->previous_ = previous;
-
-                if (previous == nullptr)
-                {
-                    head_ = current;
-                }
-                else
-                {
-                    previous->next_ = current;
-                }
-
-                previous = current;
-            }
-
-            tail_ = previous;
+            push_tail(static_cast<const Node<T> *>(curr)->value_);
         }
-        catch (...)
-        {
-            free_data();
-            throw;
-        }
-
-        size_ = other.size_;
     }
 
-    DoublyLinkedList(DoublyLinkedList<T> &&other) noexcept
-        : head_(other.head_), tail_(other.tail_), size_(other.size_)
+    DoublyLinkedList(DoublyLinkedList<T> &&other) noexcept : DoublyLinkedList()
     {
-        other.head_ = nullptr;
-        other.tail_ = nullptr;
-        other.size_ = 0;
+        if (!other.empty())
+        {
+            sentinel_.next_ = other.sentinel_.next_;
+            sentinel_.previous_ = other.sentinel_.previous_;
+            size_ = other.size_;
+
+            sentinel_.next_->previous_ = &sentinel_;
+            sentinel_.previous_->next_ = &sentinel_;
+
+            other.sentinel_.next_ = &other.sentinel_;
+            other.sentinel_.previous_ = &other.sentinel_;
+            other.size_ = 0;
+        }
     }
 
     DoublyLinkedList<T> &operator=(const DoublyLinkedList<T> &other)
