@@ -421,6 +421,8 @@ public:
         return const_cast<T &>(std::as_const(*this)[index]);
     }
 
+    std::size_t size() const noexcept { return size_; }
+
     template <typename U>
     friend std::ostream &operator<<(std::ostream &, const DoublyLinkedList<U> &);
 };
