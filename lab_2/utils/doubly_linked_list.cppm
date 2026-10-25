@@ -3,14 +3,14 @@ export module doubly_linked_list;
 import std;
 import random_generator;
 
-struct BaseNode
+struct NodeBase
 {
-    BaseNode *previous_ = nullptr;
-    BaseNode *next_ = nullptr;
+    NodeBase *previous_ = nullptr;
+    NodeBase *next_ = nullptr;
 };
 
 template <typename T>
-struct Node final : BaseNode
+struct Node final : public NodeBase
 {
     T value_;
 
@@ -25,14 +25,14 @@ private:
     NodeBase sentinel_;
     std::size_t size_ = 0;
 
-    bool empty() const noexccept
+    bool empty() const noexcept
     {
         return sentinel_.next_ == &sentinel_;
     }
 
     void free_data() noexcept
     {
-        while(!empty())
+        while (!empty())
         {
             pop_tail();
         }
