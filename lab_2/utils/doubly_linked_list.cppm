@@ -45,7 +45,7 @@ public:
         sentinel_.previous_ = &sentinel_;
     }
 
-    DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size)
+    DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size) : DoublyLinkedList()
     {
         try
         {
@@ -57,8 +57,6 @@ public:
         catch (...)
         {
             free_data();
-            tail_ = nullptr;
-            size_ = 0;
             throw;
         }
     }
