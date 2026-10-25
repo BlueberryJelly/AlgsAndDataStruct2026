@@ -18,6 +18,137 @@ struct Node final : public NodeBase
     explicit Node(T &&value) : value_(std::move(value)) {}
 };
 
+template <typename T>
+class ConstIterator final
+{
+private:
+    const NodeBase *iterator_ = nullptr;
+
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const T *;
+    using reference = const T &;
+
+    ConstIterator() noexcept = default;
+    explicit ConstIterator(const NodeBase *start) : iterator_(start) {}
+
+    ConstIterator<T> &operator++() noexcept
+    {
+        iterator_ = iterator_->next_;
+        return *this;
+    }
+
+    ConstIterator<T> operator++(int) noexcept
+    {
+        ConstIterator<T> tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+
+    ConstIterator<T> &operator--() noexcept
+    {
+        iterator_ = iterator_->previous_;
+        return *this;
+    }
+
+    ConstIterator<T> operator--(int) noexcept
+    {
+        ConstIterator<T> tmp = *this;
+        --(*this);
+        return tmp;
+    }
+
+    const T &operator*() const noexcept
+    {
+        return static_cast<const Node<T>*>(iterator_)->value_;
+    }
+
+    const T *operator->() const noexcept
+    {
+        return &(static_cast<const Node<T>*>(iterator_)->value_);
+    }
+
+    bool operator==(const ConstIterator &other) const noexcept
+    {
+        return iterator_ == other.iterator_;
+    }
+
+    bool operator!=(const ConstIterator &other) const noexcept
+    {
+        return iterator_ != other.iterator_;
+    }
+};
+
+template <typename T>
+class Iterator final
+{
+private:
+    NodeBase *iterator_ = nullptr;
+
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T *;
+    using reference = T &;
+
+    Iterator() noexcept = default;
+    explicit Iterator(NodeBase *start) : iterator_(start) {}
+
+    operator ConstIterator<T>() const noexcept
+    {
+        return ConstIterator<T>(iterator_);
+    }
+
+    Iterator<T> &operator++() noexcept
+    {
+        iterator_ = iterator_->next_;
+        return *this;
+    }
+
+    Iterator<T> operator++(int) noexcept
+    {
+        Iterator<T> tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+
+    Iterator<T> &operator--() noexcept
+    {
+        iterator_ = iterator_->previous_;
+        return *this;
+    }
+
+    Iterator<T> operator--(int) noexcept
+    {
+        Iterator<T> tmp = *this;
+        --(*this);
+        return tmp;
+    }
+
+    T &operator*() const noexcept
+    {
+        return static_cast<Node<T>*>(iterator_)->value_;
+    }
+
+    T *operator->() const noexcept
+    {
+        return &(static_cast<Node<T>*>(iterator_)->value_);
+    }
+
+    bool operator==(const Iterator &other) const noexcept
+    {
+        return iterator_ == other.iterator_;
+    }
+
+    bool operator!=(const Iterator &other) const noexcept
+    {
+        return iterator_ != other.iterator_;
+    }
+};
+
 export template <typename T>
 class DoublyLinkedList final
 {
@@ -123,6 +254,15 @@ public:
     {
         free_data();
     }
+
+    Iterator<T> begin() noexcept { return Iterator<T>(sentinel_.next_); }
+    Iterator<T> end() noexcept { return Iterator<T>(&sentinel_); }
+
+    ConstIterator<T> begin() const noexcept { return ConstIterator<T>(sentinel_.next_); }
+    ConstIterator<T> end() const noexcept { return ConstIterator<T>(&sentinel_); }
+
+    ConstIterator<T> cbegin() const noexcept { return ConstIterator<T>(sentinel_.next_); }
+    ConstIterator<T> cend() const noexcept { return ConstIterator<T>(&sentinel_); }
 
     template <typename U>
         requires(std::constructible_from<T, U &&> &&
