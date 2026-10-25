@@ -3,15 +3,18 @@ export module doubly_linked_list;
 import std;
 import random_generator;
 
-template <typename T>
-struct Node final
+struct BaseNode
 {
-    Node<T> *previous_ = nullptr;
-    Node<T> *next_ = nullptr;
+    BaseNode *previous_ = nullptr;
+    BaseNode *next_ = nullptr;
+};
+
+template <typename T>
+struct Node final : BaseNode
+{
     T value_;
 
     explicit Node(const T &value) : value_(value) {}
-
     explicit Node(T &&value) : value_(std::move(value)) {}
 };
 
@@ -19,17 +22,19 @@ export template <typename T>
 class DoublyLinkedList final
 {
 private:
-    Node<T> *head_ = nullptr;
-    Node<T> *tail_ = nullptr;
+    NodeBase sentinel_;
     std::size_t size_ = 0;
+
+    bool empty() const noexccept
+    {
+        return sentinel_.next_ == &sentinel_;
+    }
 
     void free_data() noexcept
     {
-        while (head_ != nullptr)
+        while(!empty())
         {
-            Node<T> *tmp = head_;
-            head_ = head_->next_;
-            delete tmp;
+            pop_tail();
         }
     }
 
