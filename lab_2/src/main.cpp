@@ -36,8 +36,6 @@ std::ostream &operator<<(std::ostream &os, const BigInt &number)
 
     auto iter = number.body_.begin();
     auto stop = number.body_.end();
-    
-    if (iter == stop) { os << '0'; return os; }
 
     while (iter != stop)
     {
