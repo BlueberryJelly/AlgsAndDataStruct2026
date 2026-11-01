@@ -28,6 +28,8 @@ public:
     }
 
     friend std::ostream &operator<<(std::ostream &, const BigInt &);
+
+    friend bool operator==(const BigInt &, const BigInt &) noexcept;
 };
 
 std::ostream &operator<<(std::ostream &os, const BigInt &number)
@@ -45,11 +47,44 @@ std::ostream &operator<<(std::ostream &os, const BigInt &number)
     return os;
 }
 
+bool operator==(const BigInt &lhs, const BigInt &rhs) noexcept
+{
+    if (lhs.sign_ != rhs.sign_ ||
+        lhs.body_.size() != rhs.body_.size())
+    {
+        return false;
+    }
+
+    auto l_it = lhs.body_.begin();
+    auto r_it = rhs.body_.begin();
+
+    while (l_it != lhs.body_.end())
+    {
+        if (*l_it != *r_it)
+        {
+            return false;
+        }
+
+        ++l_it;
+        ++r_it;
+    }
+
+    return true;
+}
+
 int main()
 {
     std::cout << BigInt(100) << '\n';
     std::cout << BigInt(-123456789) << '\n';
     std::cout << BigInt(-0) << '\n';
     std::cout << BigInt(5) << '\n';
+
+    std::cout << (BigInt(5) == BigInt(5)) << '\n';
+    std::cout << (BigInt(5) == BigInt(-5)) << '\n';
+    std::cout << (BigInt(5) == BigInt(10)) << '\n';
+    std::cout << (BigInt(1112) == BigInt(1113)) << '\n';
+    std::cout << (BigInt(1112) == BigInt(-1113)) << '\n';
+    std::cout << (BigInt(1112) == BigInt(1112)) << '\n';
+
     return 0;
 }
