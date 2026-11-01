@@ -5,25 +5,25 @@ class BigInt final
 {
 private:
     int sign_ = 0;
-    DoublyLinkedList<int> body_;
+    DoublyLinkedList<std::uint8_t> body_;
 
 public:
-    BigInt(long long number)
+    BigInt(int number)
     {
         if (number == 0)
         {
             sign_ = 0;
-            body_.push_head(0);
+            body_.push_head(static_cast<std::uint8_t>(0));
             return;
         }
 
         sign_ = (number > 0) ? 1 : -1;
-        number = std::abs(number);
+        long long n = std::abs(static_cast<long long>(number));
 
-        while (number > 0)
+        while (n > 0)
         {
-            body_.push_head(static_cast<int>(number % 10));
-            number /= 10;
+            body_.push_head(static_cast<std::uint8_t>(n % 10));
+            n /= 10;
         }
     }
 
@@ -37,11 +37,11 @@ std::ostream &operator<<(std::ostream &os, const BigInt &number)
     auto iter = number.body_.begin();
     auto stop = number.body_.end();
     
-    if (iter == stop) { os << 0; return os; }
+    if (iter == stop) { os << '0'; return os; }
 
     while (iter != stop)
     {
-        os << *iter;
+        os << static_cast<int>(*iter);
         ++iter;
     }
     return os;
