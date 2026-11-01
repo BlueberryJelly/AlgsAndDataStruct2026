@@ -31,6 +31,8 @@ public:
 
     friend bool operator==(const BigInt &, const BigInt &) noexcept;
 
+    friend bool operator!=(const BigInt &, const BigInt &) noexcept;
+
     friend BigInt abs(const BigInt &);
 };
 
@@ -72,6 +74,11 @@ bool operator==(const BigInt &lhs, const BigInt &rhs) noexcept
     }
 
     return true;
+}
+
+bool operator!=(const BigInt &lhs, const BigInt &rhs) noexcept
+{
+    return !(lhs == rhs);
 }
 
 BigInt abs(const BigInt &number)
