@@ -30,6 +30,8 @@ public:
     friend std::ostream &operator<<(std::ostream &, const BigInt &);
 
     friend bool operator==(const BigInt &, const BigInt &) noexcept;
+
+    friend BigInt abs(const BigInt &);
 };
 
 std::ostream &operator<<(std::ostream &os, const BigInt &number)
@@ -72,6 +74,18 @@ bool operator==(const BigInt &lhs, const BigInt &rhs) noexcept
     return true;
 }
 
+BigInt abs(const BigInt &number)
+{
+    if (number.sign_ == -1)
+    {
+        BigInt result = number;
+        result.sign_ = 1;
+        return result;
+    }
+
+    return number;
+}
+
 int main()
 {
     std::cout << BigInt(100) << '\n';
@@ -85,6 +99,10 @@ int main()
     std::cout << (BigInt(1112) == BigInt(1113)) << '\n';
     std::cout << (BigInt(1112) == BigInt(-1113)) << '\n';
     std::cout << (BigInt(1112) == BigInt(1112)) << '\n';
+
+    std::cout << abs(BigInt(-100)) << '\n';
+    std::cout << abs(BigInt(0)) << '\n';
+    std::cout << abs(BigInt(100)) << '\n';
 
     return 0;
 }
