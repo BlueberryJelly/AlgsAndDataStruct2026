@@ -34,6 +34,8 @@ public:
     friend bool operator!=(const BigInt &, const BigInt &) noexcept;
 
     friend BigInt abs(const BigInt &);
+
+    friend BigInt operator+(const BigInt &, const BigInt &)
 };
 
 std::ostream &operator<<(std::ostream &os, const BigInt &number)
@@ -91,6 +93,24 @@ BigInt abs(const BigInt &number)
     }
 
     return number;
+}
+
+BigInt operator+(const BigInt &lhs, const BigInt &rhs)
+{
+    if (lhs == BigInt(0)) return rhs;
+
+    if (rhs == BigInt(0)) return lhs;
+
+    //дополнить нулями вначале до одного размера lhs или rhs
+
+    if (lhs.sign_ == rhs.sign_)
+    {
+    }
+    /*
+    lhs.sign_ == 1 rhs.sign_ == -1 (модуль 1 - модуль 2) оставляем знак получившего ся числа
+    lhs.sign_ == -1 rhs.sign_ == 1 (модуль 1 - модуль 2) меняем знак на противоположный
+    lhs.sign_ == rhs.sign_ (модуль 1 + модуль 2) снак как у слагаемых
+    */
 }
 
 int main()
