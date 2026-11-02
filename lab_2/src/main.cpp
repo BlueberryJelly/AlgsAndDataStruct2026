@@ -221,16 +221,16 @@ struct VerifyOperation final
     VerifyOperation(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, char operation)
         : lhs_(lhs), rhs_(rhs), expected_(expected), operation_(operation)
     {
-        switch(operation)
+        switch (operation)
         {
-            case '+':
-                result_ = lhs_ + rhs_;
-                break;
-            case '*':
-                result_ = lhs_ * rhs_;
-                break;
-            default:
-                throw std::invalid_argument("Only addition and multiplication are available.");
+        case '+':
+            result_ = lhs_ + rhs_;
+            break;
+        case '*':
+            result_ = lhs_ * rhs_;
+            break;
+        default:
+            throw std::invalid_argument("Only addition and multiplication are available.");
         }
 
         ok_ = (result_ == expected_);
