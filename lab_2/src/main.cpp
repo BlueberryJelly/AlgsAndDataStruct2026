@@ -27,75 +27,68 @@ public:
         }
     }
 
-    friend std::ostream &operator<<(std::ostream &, const BigInt &);
-
-    friend bool operator==(const BigInt &, const BigInt &) noexcept;
-
-    friend bool operator!=(const BigInt &, const BigInt &) noexcept;
-
-    friend BigInt abs(const BigInt &);
-
-    friend BigInt operator+(const BigInt &, const BigInt &)
-};
-
-std::ostream &operator<<(std::ostream &os, const BigInt &number)
-{
-    if (number.sign_ == -1) os << '-';
-
-    auto iter = number.body_.begin();
-    auto stop = number.body_.end();
-
-    while (iter != stop)
+    friend std::ostream &operator<<(std::ostream &os, const BigInt &number)
     {
-        os << static_cast<int>(*iter);
-        ++iter;
-    }
-    return os;
-}
+        if (number.sign_ == -1) os << '-';
 
-bool operator==(const BigInt &lhs, const BigInt &rhs) noexcept
-{
-    if (lhs.sign_ != rhs.sign_ ||
-        lhs.body_.size() != rhs.body_.size())
-    {
-        return false;
+        auto iter = number.body_.begin();
+        auto stop = number.body_.end();
+
+        while (iter != stop)
+        {
+            os << static_cast<int>(*iter);
+            ++iter;
+        }
+
+        return os;
     }
 
-    auto l_it = lhs.body_.begin();
-    auto r_it = rhs.body_.begin();
-
-    while (l_it != lhs.body_.end())
+    friend bool operator==(const BigInt &lhs, const BigInt &rhs) noexcept
     {
-        if (*l_it != *r_it)
+        if (lhs.sign_ != rhs.sign_ ||
+            lhs.body_.size() != rhs.body_.size())
         {
             return false;
         }
 
-        ++l_it;
-        ++r_it;
+        auto l_it = lhs.body_.begin();
+        auto r_it = rhs.body_.begin();
+
+        while (l_it != lhs.body_.end())
+        {
+            if (*l_it != *r_it)
+            {
+                return false;
+            }
+
+            ++l_it;
+            ++r_it;
+        }
+
+        return true;
     }
 
-    return true;
-}
-
-bool operator!=(const BigInt &lhs, const BigInt &rhs) noexcept
-{
-    return !(lhs == rhs);
-}
-
-BigInt abs(const BigInt &number)
-{
-    if (number.sign_ == -1)
+    friend bool operator!=(const BigInt &lhs, const BigInt &rhs) noexcept
     {
-        BigInt result = number;
-        result.sign_ = 1;
-        return result;
+        return !(lhs == rhs);
     }
 
-    return number;
-}
+    friend BigInt abs(const BigInt &number)
+    {
+        if (number.sign_ == -1)
+        {
+            BigInt result = number;
+            result.sign_ = 1;
+            return result;
+        }
 
-BigInt operator+(const BigInt &lhs, const BigInt &rhs)
+        return number;
+    }
+
+    friend BigInt operator+(const BigInt &, const BigInt &);
+};
+
+/*BigInt operator+(const BigInt &lhs, const BigInt &rhs)
 {
     if (lhs == BigInt(0)) return rhs;
 
@@ -106,12 +99,10 @@ BigInt operator+(const BigInt &lhs, const BigInt &rhs)
     if (lhs.sign_ == rhs.sign_)
     {
     }
-    /*
     lhs.sign_ == 1 rhs.sign_ == -1 (модуль 1 - модуль 2) оставляем знак получившего ся числа
     lhs.sign_ == -1 rhs.sign_ == 1 (модуль 1 - модуль 2) меняем знак на противоположный
     lhs.sign_ == rhs.sign_ (модуль 1 + модуль 2) снак как у слагаемых
-    */
-}
+}*/
 
 int main()
 {
