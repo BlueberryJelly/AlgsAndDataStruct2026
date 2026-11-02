@@ -252,17 +252,32 @@ std::ostream &operator<<(std::ostream &os, const VerifyOperation &verification)
 
 int main()
 {
-    std::cout << VerifyOperation(BigInt(100), BigInt(-1), BigInt(99), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(-100), BigInt(1), BigInt(-99), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(1000), BigInt(-999), BigInt(1), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(5), BigInt(-5), BigInt(0), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(0), BigInt(-7), BigInt(-7), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(100), BigInt(-1), BigInt(100 - 1), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(-100), BigInt(1), BigInt(-100 + 1), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(1000), BigInt(-999), BigInt(1000 - 999), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(5), BigInt(-5), BigInt(5 - 5), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(0), BigInt(-7), BigInt(0 - 7), '+') << '\n';
 
-    std::cout << VerifyOperation(BigInt(12), BigInt(12), BigInt(144), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(-12), BigInt(12), BigInt(-144), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(-12), BigInt(-12), BigInt(144), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(100), BigInt(-100), BigInt(-10000), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(0), BigInt(-5), BigInt(0), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(12), BigInt(12), BigInt(12 * 12), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(-12), BigInt(12), BigInt(-12 * 12), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(-12), BigInt(-12), BigInt(-12 * (-12)), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(100), BigInt(-100), BigInt(100 * (-100)), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(0), BigInt(-5), BigInt(0 * (-5)), '*') << '\n';
+
+    int min_int = std::numeric_limits<int>::min();
+    int max_int = std::numeric_limits<int>::max();
+
+    long long overflow = static_cast<long long>(min_int) + static_cast<long long>(min_int);
+    std::cout << VerifyOperation(BigInt(min_int), BigInt(min_int), BigInt(overflow), '+') << '\n';
+
+    overflow = static_cast<long long>(max_int) + static_cast<long long>(max_int);
+    std::cout << VerifyOperation(BigInt(max_int), BigInt(max_int), BigInt(overflow), '+') << '\n';
+
+    overflow = static_cast<long long>(min_int) * static_cast<long long>(max_int);
+    std::cout << VerifyOperation(BigInt(min_int), BigInt(max_int), BigInt(overflow), '*') << '\n';
+
+    overflow = static_cast<long long>(max_int) * static_cast<long long>(max_int);
+    std::cout << VerifyOperation(BigInt(max_int), BigInt(max_int), BigInt(overflow), '*') << '\n';
 
     return 0;
 }
