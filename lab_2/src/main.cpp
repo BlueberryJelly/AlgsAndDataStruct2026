@@ -95,24 +95,62 @@ public:
         return number;
     }
 
-    friend BigInt operator+(const BigInt &, const BigInt &);
-};
-
-/*BigInt operator+(const BigInt &lhs, const BigInt &rhs)
+    friend BigInt operator+(BigInt lhs, BigInt rhs)
 {
     if (lhs == BigInt(0)) return rhs;
 
     if (rhs == BigInt(0)) return lhs;
 
-    //дополнить нулями вначале до одного размера lhs или rhs
+        if (lhs.body_.size() > rhs.body_.size())
+        {
+            rhs.fill_to_size(lhs.body_.size());
+        }
+        else
+        {
+            lhs.fill_to_size(rhs.body_.size());
+        }
+
+        BigInt result;
+
+        auto l_it = lhs.body_.end();
+        auto r_it = rhs.body_.end();
+
+        auto stop = lhs.body_.begin();
 
     if (lhs.sign_ == rhs.sign_)
     {
+            result.sign_ = lhs.sign_;
+
+            int carry = 0;
+
+            while (l_it != stop)
+            {
+                --l_it;
+                --r_it;
+
+                carry += static_cast<int>(*l_it) + static_cast<int>(*r_it);
+                result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
+                carry /= 10;
+            }
+
+            while (carry > 0)
+            {
+                result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
+                carry /= 10;
+            }
+        }
+        else
+        {
+            throw std::logic_error("Placeholder");
+        }
+
+        return result;
+        
+        //lhs.sign_ == 1 rhs.sign_ == -1 (модуль 1 - модуль 2) оставляем знак получившего ся числа
+        //lhs.sign_ == -1 rhs.sign_ == 1 (модуль 1 - модуль 2) меняем знак на противоположный
+        //lhs.sign_ == rhs.sign_ (модуль 1 + модуль 2) снак как у слагаемых
     }
-    lhs.sign_ == 1 rhs.sign_ == -1 (модуль 1 - модуль 2) оставляем знак получившего ся числа
-    lhs.sign_ == -1 rhs.sign_ == 1 (модуль 1 - модуль 2) меняем знак на противоположный
-    lhs.sign_ == rhs.sign_ (модуль 1 + модуль 2) снак как у слагаемых
-}*/
+};
 
 int main()
 {
