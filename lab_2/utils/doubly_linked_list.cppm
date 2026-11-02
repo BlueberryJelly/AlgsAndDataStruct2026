@@ -427,8 +427,8 @@ public:
 export template <typename T>
 std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
 {
-    ConstIterator iterator = list.begin();
-    ConstIterator stop = list.end();
+    ConstIterator<T> iterator = list.begin();
+    ConstIterator<T> stop = list.end();
 
     while (iterator != stop)
     {
