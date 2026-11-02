@@ -442,6 +442,5 @@ std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
         }
     }
 
-    os << "\n";
     return os;
 }
