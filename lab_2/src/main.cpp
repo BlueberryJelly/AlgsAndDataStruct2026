@@ -207,6 +207,49 @@ public:
     }
 };
 
+struct VerifyOperation final
+{
+    BigInt lhs_;
+    BigInt rhs_;
+    BigInt expected_;
+    BigInt result_;
+    char operation_;
+    bool ok_;
+
+    VerifyOperation() = delete;
+
+    VerifyOperation(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, char operation)
+        : lhs_(lhs), rhs_(rhs), expected_(expected), operation_(operation)
+    {
+        switch(operation)
+        {
+            case '+':
+                result_ = lhs_ + rhs_;
+                break;
+            case '*':
+                result_ = lhs_ * rhs_;
+                break;
+            default:
+                throw std::invalid_argument("Only addition and multiplication are available.");
+        }
+
+        ok_ = (result_ == expected_);
+    }
+};
+
+std::ostream &operator<<(std::ostream &os, const VerifyOperation &verification)
+{
+    os << verification.lhs_ << ' ' << verification.operation_ << ' ' << verification.rhs_ << '\n';
+    os << "Result:" << ' ';
+    os << verification.result_ << '\n';
+    os << "Expected:" << ' ';
+    os << verification.expected_ << '\n';
+    os << "Verified:" << ' ';
+    os << (verification.ok_ ? "Yes" : "No") << '\n';
+
+    return os;
+}
+
 int main()
 {
     std::cout << BigInt(100) << '\n';
