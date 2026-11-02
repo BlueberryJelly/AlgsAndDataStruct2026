@@ -156,7 +156,54 @@ public:
         }
 
         return result;
+    }
 
+    friend BigInt operator*(const BigInt &lhs, const BigInt &rhs)
+    {
+        if (lhs.sign_ == 0 || rhs.sign_ == 0) return BigInt(0);
+
+        BigInt result;
+        std::size_t shift = 0;
+
+        auto r_it = rhs.body_.end();
+
+        while (r_it != rhs.body_.begin())
+        {
+            --r_it;
+
+            if (*r_it != 0)
+            {
+                BigInt partial;
+                partial.sign_ = 1;
+
+                for (std::size_t i = 0; i < shift; ++i)
+                {
+                    partial.body_.push_head(static_cast<std::uint8_t>(0));
+                }
+
+                int carry = 0;
+                auto l_it = lhs.body_.end();
+
+                while (l_it != lhs.body_.begin())
+                {
+                    --l_it;
+
+                    carry += static_cast<int>(*l_it) * static_cast<int>(*r_it);
+                    partial.body_.push_head(static_cast<std::uint8_t>(carry % 10));
+                    carry /= 10;
+                }
+
+                if (carry > 0) partial.body_.push_head(static_cast<std::uint8_t>(carry));
+
+                result = std::move(result) + std::move(partial);
+            }
+
+            ++shift;
+        }
+
+        result.sign_ = lhs.sign_ * rhs.sign_;
+
+        return result;
     }
 };
 
