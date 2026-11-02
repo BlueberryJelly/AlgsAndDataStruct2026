@@ -16,6 +16,8 @@ private:
     }
 
 public:
+    BigInt() noexcept = default;
+
     BigInt(int number)
     {
         if (number == 0)
