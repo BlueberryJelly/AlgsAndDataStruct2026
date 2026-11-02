@@ -432,7 +432,6 @@ std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
 
     while (iterator != stop)
     {
-        
         os << *iterator;
         ++iterator;
 
