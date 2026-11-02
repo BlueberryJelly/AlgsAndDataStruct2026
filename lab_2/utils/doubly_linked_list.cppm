@@ -422,26 +422,24 @@ public:
     }
 
     std::size_t size() const noexcept { return size_; }
-
-    template <typename U>
-    friend std::ostream &operator<<(std::ostream &, const DoublyLinkedList<U> &);
 };
 
-template <typename T>
+export template <typename T>
 std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
 {
-    const NodeBase *current = list.sentinel_.next_;
+    ConstIterator iterator = list.begin();
+    ConstIterator stop = list.end();
 
-    if (current != &list.sentinel_)
+    while (iterator != stop)
     {
-        os << static_cast<const Node<T> *>(current)->value_;
-        current = current->next_;
-    }
+        
+        os << *iterator;
+        ++iterator;
 
-    while (current != &list.sentinel_)
-    {
-        os << ", " << static_cast<const Node<T> *>(current)->value_;
-        current = current->next_;
+        if (iterator != stop)
+        {
+            os << ", ";
+        }
     }
 
     os << "\n";
