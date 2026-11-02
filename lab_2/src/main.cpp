@@ -18,7 +18,7 @@ private:
 public:
     BigInt() noexcept = default;
 
-    BigInt(int number)
+    BigInt(long long number)
     {
         if (number == 0)
         {
@@ -28,7 +28,7 @@ public:
         }
 
         sign_ = (number > 0) ? 1 : -1;
-        long long n = std::abs(static_cast<long long>(number));
+        unsigned long long n = std::abs(number);
 
         while (n > 0)
         {
