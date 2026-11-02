@@ -127,11 +127,7 @@ public:
             result.body_.push_head(static_cast<std::uint8_t>(total - carry * 10));
         }
 
-        while (carry > 0)
-        {
-            result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
-            carry /= 10;
-        }
+        if (carry > 0) result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
 
         if (!same_sign)
         {
