@@ -127,23 +127,23 @@ public:
         auto stop = lhs.body_.begin();
 
         const int rhs_sign = same_sign ? 1 : -1;
-            int carry = 0;
+        int carry = 0;
 
-            while (l_it != stop)
-            {
-                --l_it;
-                --r_it;
+        while (l_it != stop)
+        {
+            --l_it;
+            --r_it;
 
             const int total = carry + static_cast<int>(*l_it) + rhs_sign * static_cast<int>(*r_it);
             carry = (total < 0) ? -1 : total / 10;
             result.body_.push_head(static_cast<std::uint8_t>(total - carry * 10));
-            }
+        }
 
-            while (carry > 0)
-            {
-                result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
-                carry /= 10;
-            }
+        while (carry > 0)
+        {
+            result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
+            carry /= 10;
+        }
 
         if (!same_sign)
         {
@@ -252,26 +252,17 @@ std::ostream &operator<<(std::ostream &os, const VerifyOperation &verification)
 
 int main()
 {
-    std::cout << BigInt(100) << '\n';
-    std::cout << BigInt(-1234567899) << '\n';
-    std::cout << BigInt(-01) << '\n';
-    std::cout << BigInt(5) << '\n';
+    std::cout << VerifyOperation(BigInt(100), BigInt(-1), BigInt(99), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(-100), BigInt(1), BigInt(-99), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(1000), BigInt(-999), BigInt(1), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(5), BigInt(-5), BigInt(0), '+') << '\n';
+    std::cout << VerifyOperation(BigInt(0), BigInt(-7), BigInt(-7), '+') << '\n';
 
-    std::cout << (BigInt(5) == BigInt(5)) << '\n';
-    std::cout << (BigInt(5) == BigInt(-5)) << '\n';
-    std::cout << (BigInt(5) == BigInt(10)) << '\n';
-    std::cout << (BigInt(1112) == BigInt(1113)) << '\n';
-    std::cout << (BigInt(1112) == BigInt(-1113)) << '\n';
-    std::cout << (BigInt(1112) == BigInt(1112)) << '\n';
-
-    std::cout << abs(BigInt(-100)) << '\n';
-    std::cout << abs(BigInt(0)) << '\n';
-    std::cout << abs(BigInt(100)) << '\n';
-
-    std::cout << (BigInt(-100) + BigInt(-100)) << '\n';
-    std::cout << (BigInt(100) + BigInt(100)) << '\n';
-    std::cout << (BigInt(2147483647) + BigInt(2147483647)) << '\n';
-    std::cout << (BigInt(-10) + BigInt(-1000)) << '\n';
+    std::cout << VerifyOperation(BigInt(12), BigInt(12), BigInt(144), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(-12), BigInt(12), BigInt(-144), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(-12), BigInt(-12), BigInt(144), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(100), BigInt(-100), BigInt(-10000), '*') << '\n';
+    std::cout << VerifyOperation(BigInt(0), BigInt(-5), BigInt(0), '*') << '\n';
 
     return 0;
 }
