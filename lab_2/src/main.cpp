@@ -96,10 +96,10 @@ public:
     }
 
     friend BigInt operator+(BigInt lhs, BigInt rhs)
-{
-    if (lhs == BigInt(0)) return rhs;
+    {
+        if (lhs == BigInt(0)) return rhs;
 
-    if (rhs == BigInt(0)) return lhs;
+        if (rhs == BigInt(0)) return lhs;
 
         if (lhs.body_.size() > rhs.body_.size())
         {
@@ -117,8 +117,8 @@ public:
 
         auto stop = lhs.body_.begin();
 
-    if (lhs.sign_ == rhs.sign_)
-    {
+        if (lhs.sign_ == rhs.sign_)
+        {
             result.sign_ = lhs.sign_;
 
             int carry = 0;
@@ -155,8 +155,8 @@ public:
 int main()
 {
     std::cout << BigInt(100) << '\n';
-    std::cout << BigInt(-123456789) << '\n';
-    std::cout << BigInt(-0) << '\n';
+    std::cout << BigInt(-1234567899) << '\n';
+    std::cout << BigInt(-01) << '\n';
     std::cout << BigInt(5) << '\n';
 
     std::cout << (BigInt(5) == BigInt(5)) << '\n';
@@ -169,6 +169,11 @@ int main()
     std::cout << abs(BigInt(-100)) << '\n';
     std::cout << abs(BigInt(0)) << '\n';
     std::cout << abs(BigInt(100)) << '\n';
+
+    std::cout << (BigInt(-100) + BigInt(-100)) << '\n';
+    std::cout << (BigInt(100) + BigInt(100)) << '\n';
+    std::cout << (BigInt(2147483647) + BigInt(2147483647)) << '\n';
+    std::cout << (BigInt(-10) + BigInt(-1000)) << '\n';
 
     return 0;
 }
