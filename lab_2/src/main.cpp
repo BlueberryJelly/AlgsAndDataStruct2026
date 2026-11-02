@@ -97,9 +97,9 @@ public:
 
     friend BigInt operator+(BigInt lhs, BigInt rhs)
     {
-        if (lhs == BigInt(0)) return rhs;
+        if (lhs.sign_ == 0) return rhs;
 
-        if (rhs == BigInt(0)) return lhs;
+        if (rhs.sign_ == 0) return lhs;
 
         if (lhs.body_.size() > rhs.body_.size())
         {
@@ -110,17 +110,23 @@ public:
             lhs.fill_to_size(rhs.body_.size());
         }
 
+        const bool same_sign = lhs.sign_ == rhs.sign_;
+
+        if (!same_sign && std::lexicographical_compare(lhs.body_.begin(), lhs.body_.end(),
+                                                       rhs.body_.begin(), rhs.body_.end()))
+        {
+            std::swap(lhs, rhs);
+        }
+
         BigInt result;
+        result.sign_ = lhs.sign_;
 
         auto l_it = lhs.body_.end();
         auto r_it = rhs.body_.end();
 
         auto stop = lhs.body_.begin();
 
-        if (lhs.sign_ == rhs.sign_)
-        {
-            result.sign_ = lhs.sign_;
-
+        const int rhs_sign = same_sign ? 1 : -1;
             int carry = 0;
 
             while (l_it != stop)
@@ -128,9 +134,9 @@ public:
                 --l_it;
                 --r_it;
 
-                carry += static_cast<int>(*l_it) + static_cast<int>(*r_it);
-                result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
-                carry /= 10;
+            const int total = carry + static_cast<int>(*l_it) + rhs_sign * static_cast<int>(*r_it);
+            carry = (total < 0) ? -1 : total / 10;
+            result.body_.push_head(static_cast<std::uint8_t>(total - carry * 10));
             }
 
             while (carry > 0)
@@ -138,17 +144,19 @@ public:
                 result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
                 carry /= 10;
             }
-        }
-        else
+
+        if (!same_sign)
         {
-            throw std::logic_error("Placeholder");
+            while (result.body_.size() > 1 && *result.body_.begin() == 0)
+            {
+                result.body_.pop_head();
+            }
+
+            if (*result.body_.begin() == 0) result.sign_ = 0;
         }
 
         return result;
-        
-        //lhs.sign_ == 1 rhs.sign_ == -1 (модуль 1 - модуль 2) оставляем знак получившего ся числа
-        //lhs.sign_ == -1 rhs.sign_ == 1 (модуль 1 - модуль 2) меняем знак на противоположный
-        //lhs.sign_ == rhs.sign_ (модуль 1 + модуль 2) снак как у слагаемых
+
     }
 };
 
