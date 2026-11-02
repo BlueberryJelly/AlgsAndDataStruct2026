@@ -83,18 +83,6 @@ public:
         return !(lhs == rhs);
     }
 
-    friend BigInt abs(const BigInt &number)
-    {
-        if (number.sign_ == -1)
-        {
-            BigInt result = number;
-            result.sign_ = 1;
-            return result;
-        }
-
-        return number;
-    }
-
     friend BigInt operator+(BigInt lhs, BigInt rhs)
     {
         if (lhs.sign_ == 0) return rhs;
