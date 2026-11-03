@@ -9,7 +9,7 @@ private:
 
     void fill_to_size(std::size_t size)
     {
-        while (body_.size() != size)
+        while (body_.size() < size)
         {
             body_.push_head(static_cast<std::uint8_t>(0));
         }
