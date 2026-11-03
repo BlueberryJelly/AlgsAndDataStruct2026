@@ -88,11 +88,6 @@ private:
     NodeBase sentinel_;
     std::size_t size_ = 0;
 
-    bool empty() const noexcept
-    {
-        return sentinel_.next_ == &sentinel_;
-    }
-
     void free_data() noexcept
     {
         while (!empty())
@@ -195,6 +190,11 @@ public:
 
     ConstIterator<T> begin() const noexcept { return ConstIterator<T>(sentinel_.next_); }
     ConstIterator<T> end() const noexcept { return ConstIterator<T>(&sentinel_); }
+
+    bool empty() const noexcept
+    {
+        return sentinel_.next_ == &sentinel_;
+    }
 
     template <typename U>
         requires(std::constructible_from<T, U &&> &&
