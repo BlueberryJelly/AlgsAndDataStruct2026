@@ -15,7 +15,17 @@ export namespace random_utils
         template <typename T>
         struct random_generator_traits;
 
-        template <std::integral T>
+        template <typename T>
+        concept DistributableInt = std::is_same_v<T, short> ||
+                                   std::is_same_v<T, int> ||
+                                   std::is_same_v<T, long> ||
+                                   std::is_same_v<T, long long> ||
+                                   std::is_same_v<T, unsigned short> ||
+                                   std::is_same_v<T, unsigned int> ||
+                                   std::is_same_v<T, unsigned long> ||
+                                   std::is_same_v<T, unsigned long long>;
+
+        template <DistributableInt T>
         struct random_generator_traits<T>
         {
             static T generate(const T &min_value, const T &max_value)
@@ -25,7 +35,12 @@ export namespace random_utils
             }
         };
 
-        template <std::floating_point T>
+        template <typename T>
+        concept DistributableReal = std::is_same_v<T, float> ||
+                                    std::is_same_v<T, double> ||
+                                    std::is_same_v<T, long double>;
+
+        template <DistributableReal T>
         struct random_generator_traits<T>
         {
             static T generate(const T &min_value, const T &max_value)
