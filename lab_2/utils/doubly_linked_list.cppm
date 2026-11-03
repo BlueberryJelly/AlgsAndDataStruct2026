@@ -307,7 +307,7 @@ public:
         --size_;
     }
 
-    void delete_node(const T &value)
+    void remove_all_value(const T &value)
     {
         NodeBase *current = sentinel_.next_;
 
