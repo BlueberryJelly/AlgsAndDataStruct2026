@@ -32,6 +32,7 @@ public:
     using reference = const T &;
 
     ConstIterator() noexcept = default;
+
     explicit ConstIterator(const NodeBase *start) : iterator_(start) {}
 
     ConstIterator<T> &operator++() noexcept
