@@ -28,7 +28,9 @@ public:
         }
 
         sign_ = (number > 0) ? 1 : -1;
-        unsigned long long n = std::abs(number);
+        unsigned long long n = (number < 0)
+                                   ? 0ULL - static_cast<unsigned long long>(number)
+                                   : static_cast<unsigned long long>(number);
 
         while (n > 0)
         {
