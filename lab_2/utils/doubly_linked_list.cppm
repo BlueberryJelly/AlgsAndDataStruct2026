@@ -189,8 +189,8 @@ public:
         free_data();
     }
 
-    ConstIterator<T> begin() const noexcept { return ConstIterator<T>(sentinel_.next_); }
-    ConstIterator<T> end() const noexcept { return ConstIterator<T>(&sentinel_); }
+    ConstIterator<T> cbegin() const noexcept { return ConstIterator<T>(sentinel_.next_); }
+    ConstIterator<T> cend() const noexcept { return ConstIterator<T>(&sentinel_); }
 
     bool empty() const noexcept
     {
@@ -362,8 +362,8 @@ public:
 export template <typename T>
 std::ostream &operator<<(std::ostream &os, const DoublyLinkedList<T> &list)
 {
-    ConstIterator<T> iterator = list.begin();
-    ConstIterator<T> stop = list.end();
+    ConstIterator<T> iterator = list.cbegin();
+    ConstIterator<T> stop = list.cend();
 
     while (iterator != stop)
     {

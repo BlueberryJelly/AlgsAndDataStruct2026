@@ -43,8 +43,8 @@ public:
     {
         if (number.sign_ == -1) os << '-';
 
-        auto iter = number.body_.begin();
-        auto stop = number.body_.end();
+        auto iter = number.body_.cbegin();
+        auto stop = number.body_.cend();
 
         while (iter != stop)
         {
@@ -63,10 +63,10 @@ public:
             return false;
         }
 
-        auto l_it = lhs.body_.begin();
-        auto r_it = rhs.body_.begin();
+        auto l_it = lhs.body_.cbegin();
+        auto r_it = rhs.body_.cbegin();
 
-        while (l_it != lhs.body_.end())
+        while (l_it != lhs.body_.cend())
         {
             if (*l_it != *r_it)
             {
@@ -102,8 +102,8 @@ public:
 
         const bool same_sign = lhs.sign_ == rhs.sign_;
 
-        if (!same_sign && std::lexicographical_compare(lhs.body_.begin(), lhs.body_.end(),
-                                                       rhs.body_.begin(), rhs.body_.end()))
+        if (!same_sign && std::lexicographical_compare(lhs.body_.cbegin(), lhs.body_.cend(),
+                                                       rhs.body_.cbegin(), rhs.body_.cend()))
         {
             std::swap(lhs, rhs);
         }
@@ -111,10 +111,10 @@ public:
         BigInt result;
         result.sign_ = lhs.sign_;
 
-        auto l_it = lhs.body_.end();
-        auto r_it = rhs.body_.end();
+        auto l_it = lhs.body_.cend();
+        auto r_it = rhs.body_.cend();
 
-        auto stop = lhs.body_.begin();
+        auto stop = lhs.body_.cbegin();
 
         const int rhs_sign = same_sign ? 1 : -1;
         int carry = 0;
@@ -133,12 +133,12 @@ public:
 
         if (!same_sign)
         {
-            while (result.body_.size() > 1 && *result.body_.begin() == 0)
+            while (result.body_.size() > 1 && *result.body_.cbegin() == 0)
             {
                 result.body_.pop_head();
             }
 
-            if (*result.body_.begin() == 0) result.sign_ = 0;
+            if (*result.body_.cbegin() == 0) result.sign_ = 0;
         }
 
         return result;
@@ -151,9 +151,9 @@ public:
         BigInt result;
         std::size_t shift = 0;
 
-        auto r_it = rhs.body_.end();
+        auto r_it = rhs.body_.cend();
 
-        while (r_it != rhs.body_.begin())
+        while (r_it != rhs.body_.cbegin())
         {
             --r_it;
 
@@ -168,9 +168,9 @@ public:
                 }
 
                 int carry = 0;
-                auto l_it = lhs.body_.end();
+                auto l_it = lhs.body_.cend();
 
-                while (l_it != lhs.body_.begin())
+                while (l_it != lhs.body_.cbegin())
                 {
                     --l_it;
 
