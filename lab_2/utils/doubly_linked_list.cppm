@@ -194,9 +194,17 @@ public:
 
     DoublyLinkedList(const DoublyLinkedList<T> &other) : DoublyLinkedList()
     {
-        for (const NodeBase *curr = other.sentinel_.next_; curr != &other.sentinel_; curr = curr->next_)
+        try
         {
-            push_tail(static_cast<const Node<T> *>(curr)->value_);
+            for (const NodeBase *curr = other.sentinel_.next_; curr != &other.sentinel_; curr = curr->next_)
+            {
+                push_tail(static_cast<const Node<T> *>(curr)->value_);
+            }
+        }
+        catch (...)
+        {
+            free_data();
+            throw;
         }
     }
 
