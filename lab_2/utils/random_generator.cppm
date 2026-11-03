@@ -55,7 +55,7 @@ export namespace random_utils
         {
             if (min_value > max_value)
             {
-                throw std::invalid_argument("Min must be <= max");
+                throw std::invalid_argument("Min must be <= max.");
             }
         }
     }
