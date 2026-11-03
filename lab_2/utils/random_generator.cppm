@@ -8,11 +8,7 @@ export namespace random_utils
     {
         inline std::mt19937_64 &random_engine()
         {
-            thread_local std::mt19937_64 generator{[]{
-                std::random_device rd;
-                std::seed_seq seed{rd(), rd(), rd(), rd()};
-                return std::mt19937_64{seed};
-            }()};
+            static std::mt19937_64 generator(std::random_device{}());
             return generator;
         }
 
