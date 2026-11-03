@@ -34,11 +34,21 @@ export namespace random_utils
                 return distribution(random_engine());
             }
         };
+
+        template <typename T>
+        void validate_range(const T &min_value, const T &max_value)
+        {
+            if (min_value > max_value)
+            {
+                throw std::invalid_argument("Min must be <= max");
+            }
+        }
     }
 
     template <typename T>
     T generate_random(const T &min_value, const T &max_value)
     {
+        detail::validate_range(min_value, max_value);
         return detail::random_generator_traits<T>::generate(min_value, max_value);
     }
 }
