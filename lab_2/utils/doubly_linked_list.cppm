@@ -138,18 +138,7 @@ public:
 
     DoublyLinkedList(DoublyLinkedList<T> &&other) noexcept : DoublyLinkedList()
     {
-        if (!other.empty())
-        {
-            sentinel_.previous_ = other.sentinel_.previous_;
-            other.sentinel_.previous_ = &other.sentinel_;
-            sentinel_.next_ = other.sentinel_.next_;
-            other.sentinel_.next_ = &other.sentinel_;
-            size_ = other.size_;
-            other.size_ = 0;
-
-            sentinel_.previous_->next_ = &sentinel_;
-            sentinel_.next_->previous_ = &sentinel_;
-        }
+        *this = std::move(other);
     }
 
     DoublyLinkedList<T> &operator=(const DoublyLinkedList<T> &other)
