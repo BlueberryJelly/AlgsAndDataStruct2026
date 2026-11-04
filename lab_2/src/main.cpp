@@ -2,34 +2,37 @@ import std;
 import doubly_linked_list;
 import big_int;
 
+enum class Operation : bool
+{
+    sum,
+    multiply
+};
+
+BigInt apply(const BigInt &lhs, const BigInt &rhs, Operation operation)
+{
+    switch (operation)
+    {
+    case Operation::sum:
+        return lhs + rhs;
+    case Operation::multiply:
+        return lhs * rhs;
+    default:
+        throw std::invalid_argument("Only addition and multiplication are available.");
+    }
+}
+
 struct VerifyOperation final
 {
-    BigInt lhs_;
-    BigInt rhs_;
-    BigInt expected_;
-    BigInt result_;
-    char operation_;
-    bool ok_;
+    const BigInt lhs_;
+    const BigInt rhs_;
+    const BigInt expected_;
+    const Operation operation_;
+    const BigInt result_;
+    const bool ok_;
 
-    VerifyOperation() = delete;
-
-    VerifyOperation(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, char operation)
-        : lhs_(lhs), rhs_(rhs), expected_(expected), operation_(operation)
-    {
-        switch (operation)
-        {
-        case '+':
-            result_ = lhs_ + rhs_;
-            break;
-        case '*':
-            result_ = lhs_ * rhs_;
-            break;
-        default:
-            throw std::invalid_argument("Only addition and multiplication are available.");
-        }
-
-        ok_ = (result_ == expected_);
-    }
+    VerifyOperation(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, Operation operation)
+        : lhs_(lhs), rhs_(rhs), expected_(expected), operation_(operation),
+          result_(apply(lhs, rhs, operation)), ok_(result_ == expected) {}
 };
 
 std::ostream &operator<<(std::ostream &os, const VerifyOperation &verification)
