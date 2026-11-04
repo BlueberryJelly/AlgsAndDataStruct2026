@@ -11,6 +11,11 @@ private:
     int sign_ = 0;
     Digits body_;
 
+    BigInt(int sign, Digits body) : sign_(sign), body_(std::move(body))
+    {
+        normalize();
+    }
+
     static void push_digit(Digits &digits, int digit)
     {
         digits.push_head(static_cast<std::uint8_t>(digit));
@@ -94,5 +99,15 @@ public:
         return lhs.sign_ == rhs.sign_ &&
                std::equal(lhs.body_.cbegin(), lhs.body_.cend(),
                           rhs.body_.cbegin(), rhs.body_.cend());
+    }
+
+    friend BigInt operator+(const BigInt &lhs, const BigInt &rhs)
+    {
+        const bool lhs_smaller = less_magnitude(lhs.body_, rhs.body_);
+        const BigInt &big = lhs_smaller ? rhs : lhs;
+        const BigInt &small = lhs_smaller ? lhs : rhs;
+        const int factor = (lhs.sign_ == rhs.sign_) ? 1 : -1;
+
+        return BigInt(big.sign_, combine(big.body_, small.body_, factor));
     }
 };
