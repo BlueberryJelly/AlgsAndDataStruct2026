@@ -46,19 +46,24 @@ std::ostream &operator<<(std::ostream &os, const VerifyOperation &v)
     return os;
 }
 
+static void check(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, Operation operation)
+{
+    std::cout << VerifyOperation(lhs, rhs, expected, operation) << '\n';
+}
+
 int main()
 {
-    std::cout << VerifyOperation(BigInt(100), BigInt(-1), BigInt(100 - 1), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(-100), BigInt(1), BigInt(-100 + 1), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(1000), BigInt(-999), BigInt(1000 - 999), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(5), BigInt(-5), BigInt(5 - 5), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(0), BigInt(-7), BigInt(0 - 7), '+') << '\n';
+    check(100, -1, 100 - 1, Operation::sum);
+    check(-100, 1, -100 + 1, Operation::sum);
+    check(1000, -999, 1000 - 999, Operation::sum);
+    check(5, -5, 5 - 5, Operation::sum);
+    check(0, -7, 0 - 7, Operation::sum);
 
-    std::cout << VerifyOperation(BigInt(12), BigInt(12), BigInt(12 * 12), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(-12), BigInt(12), BigInt(-12 * 12), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(-12), BigInt(-12), BigInt(-12 * (-12)), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(100), BigInt(-100), BigInt(100 * (-100)), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(0), BigInt(-5), BigInt(0 * (-5)), '*') << '\n';
+    check(12, 12, 12 * 12, Operation::multiply);
+    check(-12, 12, -12 * 12, Operation::multiply);
+    check(-12, -12, -12 * -12, Operation::multiply);
+    check(100, -100, 100 * -100, Operation::multiply);
+    check(0, -5, 0 * -5, Operation::multiply);
 
     long long min_int = std::numeric_limits<int>::min();
     long long max_int = std::numeric_limits<int>::max();
