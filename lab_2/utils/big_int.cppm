@@ -15,6 +15,14 @@ private:
     {
         digits.push_head(static_cast<std::uint8_t>(digit));
     }
+
+    static bool less_magnitude(const Digits &lhs, const Digits &rhs)
+    {
+        if (lhs.size() != rhs.size()) return lhs.size() < rhs.size();
+
+        return std::lexicographical_compare(lhs.cbegin(), lhs.cend(),
+                                            rhs.cbegin(), rhs.cend());
+    }
 public:
     BigInt(long long number = 0)
     {
