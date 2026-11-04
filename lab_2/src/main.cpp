@@ -65,20 +65,20 @@ int main()
     check(100, -100, 100 * -100, Operation::multiply);
     check(0, -5, 0 * -5, Operation::multiply);
 
-    long long min_int = std::numeric_limits<int>::min();
-    long long max_int = std::numeric_limits<int>::max();
+    constexpr long long min_int = std::numeric_limits<int>::min();
+    constexpr long long max_int = std::numeric_limits<int>::max();
 
-    long long overflow = min_int + min_int;
-    std::cout << VerifyOperation(BigInt(min_int), BigInt(min_int), BigInt(overflow), '+') << '\n';
+    check(min_int, min_int, min_int + min_int, Operation::sum);
+    check(max_int, max_int, max_int + max_int, Operation::sum);
+    check(min_int, max_int, min_int * max_int, Operation::multiply);
+    check(max_int, max_int, max_int * max_int, Operation::multiply);
 
-    overflow = max_int + max_int;
-    std::cout << VerifyOperation(BigInt(max_int), BigInt(max_int), BigInt(overflow), '+') << '\n';
+    const BigInt huge("99999999999999999999");
 
-    overflow = min_int * max_int;
-    std::cout << VerifyOperation(BigInt(min_int), BigInt(max_int), BigInt(overflow), '*') << '\n';
-
-    overflow = max_int * max_int;
-    std::cout << VerifyOperation(BigInt(max_int), BigInt(max_int), BigInt(overflow), '*') << '\n';
+    check(huge, 1, BigInt("100000000000000000000"), Operation::sum);
+    check(huge, huge, BigInt("99999999999999999998"
+                             "00000000000000000001"),
+          Operation::multiply);
 
     return 0;
 }
