@@ -30,4 +30,16 @@ public:
             n /= 10;
         } while (n > 0);
     }
+
+    friend std::ostream &operator<<(std::ostream &os, const BigInt &number)
+    {
+        if (number.sign_ < 0) os << '-';
+
+        for (auto it = number.body_.cbegin(); it != number.body_.cend(); ++it)
+        {
+            os << static_cast<int>(*it);
+        }
+
+        return os;
+    }
 };
