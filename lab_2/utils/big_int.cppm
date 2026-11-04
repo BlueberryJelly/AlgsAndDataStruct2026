@@ -33,6 +33,34 @@ private:
         return std::lexicographical_compare(lhs.cbegin(), lhs.cend(),
                                             rhs.cbegin(), rhs.cend());
     }
+
+    static Digits combine(const Digits &big, const Digits &small, int factor)
+    {
+        Digits result;
+        auto big_it = big.cend();
+        auto small_it = small.cend();
+        int carry = 0;
+
+        while (big_it != big.cbegin())
+        {
+            --big_it;
+
+            int small_digit = 0;
+            if (small_it != small.cbegin())
+            {
+                --small_it;
+                small_digit = *small_it;
+            }
+
+            const int total = carry + *big_it + factor * small_digit;
+            carry = (total < 0) ? -1 : total / 10;
+            push_digit(result, total - carry * 10);
+        }
+
+        if (carry > 0) push_digit(result, carry);
+
+        return result;
+    }
 public:
     BigInt(long long number = 0)
     {
