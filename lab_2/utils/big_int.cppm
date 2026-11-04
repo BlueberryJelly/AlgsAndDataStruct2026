@@ -66,6 +66,32 @@ private:
 
         return result;
     }
+
+    static Digits multiply_digit(const Digits &digits, int digit, std::size_t shift)
+    {
+        Digits result;
+
+        for (std::size_t i = 0; i < shift; ++i)
+        {
+            push_digit(result, 0);
+        }
+
+        int carry = 0;
+        auto it = digits.cend();
+
+        while (it != digits.cbegin())
+        {
+            --it;
+            carry += *it * digit;
+            push_digit(result, carry % 10);
+            carry /= 10;
+        }
+
+        if (carry > 0) push_digit(result, carry);
+
+        return result;
+    }
+
 public:
     BigInt(long long number = 0)
     {
