@@ -16,6 +16,16 @@ private:
         digits.push_head(static_cast<std::uint8_t>(digit));
     }
 
+    void normalize()
+    {
+        while (body_.size() > 1 && *body_.cbegin() == 0)
+        {
+            body_.pop_head();
+        }
+
+        if (body_.size() == 1 && *body_.cbegin() == 0) sign_ = 0;
+    }
+
     static bool less_magnitude(const Digits &lhs, const Digits &rhs)
     {
         if (lhs.size() != rhs.size()) return lhs.size() < rhs.size();
