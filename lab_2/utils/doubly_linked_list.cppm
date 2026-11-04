@@ -18,7 +18,7 @@ struct Node final : public NodeBase
     explicit Node(T &&value) : value_(std::move(value)) {}
 };
 
-template <typename T>
+export template <typename T>
 class ConstIterator final
 {
 private:
