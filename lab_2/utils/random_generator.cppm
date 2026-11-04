@@ -35,12 +35,7 @@ export namespace random_utils
             }
         };
 
-        template <typename T>
-        concept DistributableReal = std::is_same_v<T, float> ||
-                                    std::is_same_v<T, double> ||
-                                    std::is_same_v<T, long double>;
-
-        template <DistributableReal T>
+        template <std::floating_point T>
         struct random_generator_traits<T>
         {
             static T generate(const T &min_value, const T &max_value)
