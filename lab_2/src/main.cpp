@@ -35,15 +35,13 @@ struct VerifyOperation final
           result_(apply(lhs, rhs, operation)), ok_(result_ == expected) {}
 };
 
-std::ostream &operator<<(std::ostream &os, const VerifyOperation &verification)
+std::ostream &operator<<(std::ostream &os, const VerifyOperation &v)
 {
-    os << verification.lhs_ << ' ' << verification.operation_ << ' ' << verification.rhs_ << '\n';
-    os << "Result:" << ' ';
-    os << verification.result_ << '\n';
-    os << "Expected:" << ' ';
-    os << verification.expected_ << '\n';
-    os << "Verified:" << ' ';
-    os << (verification.ok_ ? "Yes" : "No") << '\n';
+    char operation = (v.operation_ == Operation::sum) ? '+' : '*';
+    os << v.lhs_ << ' ' << operation << ' ' << v.rhs_ << '\n';
+    os << "Result:   " << v.result_ << '\n';
+    os << "Expected: " << v.expected_ << '\n';
+    os << "Verified: " << (v.ok_ ? "Yes" : "No") << '\n';
 
     return os;
 }
