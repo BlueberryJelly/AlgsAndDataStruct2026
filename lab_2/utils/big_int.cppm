@@ -42,4 +42,11 @@ public:
 
         return os;
     }
+
+    friend bool operator==(const BigInt &lhs, const BigInt &rhs) noexcept
+    {
+        return lhs.sign_ == rhs.sign_ &&
+               std::equal(lhs.body_.cbegin(), lhs.body_.cend(),
+                          rhs.body_.cbegin(), rhs.body_.cend());
+    }
 };
