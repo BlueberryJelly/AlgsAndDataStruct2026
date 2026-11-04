@@ -136,4 +136,20 @@ public:
 
         return BigInt(big.sign_, combine(big.body_, small.body_, factor));
     }
+
+    friend BigInt operator*(const BigInt &lhs, const BigInt &rhs)
+    {
+        BigInt result;
+        auto it = rhs.body_.cend();
+
+        for (std::size_t shift = 0; it != rhs.body_.cbegin(); ++shift)
+        {
+            --it;
+            result = result + BigInt(1, multiply_digit(lhs.body_, *it, shift));
+        }
+
+        result.sign_ *= lhs.sign_ * rhs.sign_;
+
+        return result;
+    }
 };
