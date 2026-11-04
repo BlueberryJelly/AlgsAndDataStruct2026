@@ -19,5 +19,16 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/utf-8 /W4)
 endif()
 
+function(add_cpp_module_library TARGET_NAME MODULE_FILE)
+    add_library(${TARGET_NAME} STATIC)
+
+    target_sources(${TARGET_NAME}
+        PUBLIC
+        FILE_SET CXX_MODULES
+        FILES
+        ${MODULE_FILE}
+    )
+endfunction()
+
 add_subdirectory(lab_1)
 add_subdirectory(lab_2)
