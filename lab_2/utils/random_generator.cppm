@@ -6,9 +6,9 @@ export namespace random_utils
 {
     namespace detail
     {
-        inline std::mt19937_64 &random_engine()
+        inline std::mt19937_64 &random_engine(std::uint64_t seed)
         {
-            static std::mt19937_64 generator(std::random_device{}());
+            static std::mt19937_64 generator(seed);
             return generator;
         }
 
@@ -28,20 +28,20 @@ export namespace random_utils
         template <DistributableInt T>
         struct random_generator_traits<T>
         {
-            static T generate(const T &min_value, const T &max_value)
+            static T generate(const T &min_value, const T &max_value, std::uint64_t seed)
             {
                 std::uniform_int_distribution<T> distribution(min_value, max_value);
-                return distribution(random_engine());
+                return distribution(random_engine(seed));
             }
         };
 
         template <std::floating_point T>
         struct random_generator_traits<T>
         {
-            static T generate(const T &min_value, const T &max_value)
+            static T generate(const T &min_value, const T &max_value, std::uint64_t seed)
             {
                 std::uniform_real_distribution<T> distribution(min_value, max_value);
-                return distribution(random_engine());
+                return distribution(random_engine(seed));
             }
         };
 
@@ -56,9 +56,9 @@ export namespace random_utils
     }
 
     template <typename T>
-    T generate_random(const T &min_value, const T &max_value)
+    T generate_random(const T &min_value, const T &max_value, std::uint64_t seed)
     {
         detail::validate_range(min_value, max_value);
-        return detail::random_generator_traits<T>::generate(min_value, max_value);
+        return detail::random_generator_traits<T>::generate(min_value, max_value, seed);
     }
 }

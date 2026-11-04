@@ -104,13 +104,14 @@ public:
         sentinel_.next_ = &sentinel_;
     }
 
-    DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size) : DoublyLinkedList()
+    DoublyLinkedList(const T &min_value, const T &max_value, std::size_t size, std::uint64_t seed)
+        : DoublyLinkedList()
     {
         try
         {
             for (std::size_t iteration = 0; iteration < size; ++iteration)
             {
-                push_tail(random_utils::generate_random<T>(min_value, max_value));
+                push_tail(random_utils::generate_random<T>(min_value, max_value, seed));
             }
         }
         catch (...)
