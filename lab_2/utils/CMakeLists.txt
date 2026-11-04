@@ -1,3 +1,5 @@
 add_cpp_module_library(random_generator random_generator.cppm)
 add_cpp_module_library(doubly_linked_list doubly_linked_list.cppm)
 target_link_libraries(doubly_linked_list PRIVATE random_generator)
+add_cpp_module_library(big_int big_int.cppm)
+target_link_libraries(big_int PUBLIC doubly_linked_list)

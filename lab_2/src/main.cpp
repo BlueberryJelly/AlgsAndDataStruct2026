@@ -1,269 +1,84 @@
 import std;
 import doubly_linked_list;
+import big_int;
 
-class BigInt final
+enum class Operation : bool
 {
-private:
-    int sign_ = 0;
-    DoublyLinkedList<std::uint8_t> body_;
-
-    void fill_to_size(std::size_t size)
-    {
-        while (body_.size() < size)
-        {
-            body_.push_head(static_cast<std::uint8_t>(0));
-        }
-    }
-
-public:
-    BigInt() noexcept = default;
-
-    BigInt(long long number)
-    {
-        if (number == 0)
-        {
-            sign_ = 0;
-            body_.push_head(static_cast<std::uint8_t>(0));
-            return;
-        }
-
-        sign_ = (number > 0) ? 1 : -1;
-        unsigned long long n = (number < 0)
-                                   ? 0ULL - static_cast<unsigned long long>(number)
-                                   : static_cast<unsigned long long>(number);
-
-        while (n > 0)
-        {
-            body_.push_head(static_cast<std::uint8_t>(n % 10));
-            n /= 10;
-        }
-    }
-
-    friend std::ostream &operator<<(std::ostream &os, const BigInt &number)
-    {
-        if (number.sign_ == -1) os << '-';
-
-        auto iter = number.body_.cbegin();
-        auto stop = number.body_.cend();
-
-        while (iter != stop)
-        {
-            os << static_cast<int>(*iter);
-            ++iter;
-        }
-
-        return os;
-    }
-
-    friend bool operator==(const BigInt &lhs, const BigInt &rhs) noexcept
-    {
-        if (lhs.sign_ != rhs.sign_ ||
-            lhs.body_.size() != rhs.body_.size())
-        {
-            return false;
-        }
-
-        auto l_it = lhs.body_.cbegin();
-        auto r_it = rhs.body_.cbegin();
-
-        while (l_it != lhs.body_.cend())
-        {
-            if (*l_it != *r_it)
-            {
-                return false;
-            }
-
-            ++l_it;
-            ++r_it;
-        }
-
-        return true;
-    }
-
-    friend bool operator!=(const BigInt &lhs, const BigInt &rhs) noexcept
-    {
-        return !(lhs == rhs);
-    }
-
-    friend BigInt operator+(BigInt lhs, BigInt rhs)
-    {
-        if (lhs.sign_ == 0) return rhs;
-
-        if (rhs.sign_ == 0) return lhs;
-
-        if (lhs.body_.size() > rhs.body_.size())
-        {
-            rhs.fill_to_size(lhs.body_.size());
-        }
-        else
-        {
-            lhs.fill_to_size(rhs.body_.size());
-        }
-
-        const bool same_sign = lhs.sign_ == rhs.sign_;
-
-        if (!same_sign && std::lexicographical_compare(lhs.body_.cbegin(), lhs.body_.cend(),
-                                                       rhs.body_.cbegin(), rhs.body_.cend()))
-        {
-            std::swap(lhs, rhs);
-        }
-
-        BigInt result;
-        result.sign_ = lhs.sign_;
-
-        auto l_it = lhs.body_.cend();
-        auto r_it = rhs.body_.cend();
-
-        auto stop = lhs.body_.cbegin();
-
-        const int rhs_sign = same_sign ? 1 : -1;
-        int carry = 0;
-
-        while (l_it != stop)
-        {
-            --l_it;
-            --r_it;
-
-            const int total = carry + static_cast<int>(*l_it) + rhs_sign * static_cast<int>(*r_it);
-            carry = (total < 0) ? -1 : total / 10;
-            result.body_.push_head(static_cast<std::uint8_t>(total - carry * 10));
-        }
-
-        if (carry > 0) result.body_.push_head(static_cast<std::uint8_t>(carry % 10));
-
-        if (!same_sign)
-        {
-            while (result.body_.size() > 1 && *result.body_.cbegin() == 0)
-            {
-                result.body_.pop_head();
-            }
-
-            if (*result.body_.cbegin() == 0) result.sign_ = 0;
-        }
-
-        return result;
-    }
-
-    friend BigInt operator*(const BigInt &lhs, const BigInt &rhs)
-    {
-        if (lhs.sign_ == 0 || rhs.sign_ == 0) return BigInt(0);
-
-        BigInt result;
-        std::size_t shift = 0;
-
-        auto r_it = rhs.body_.cend();
-
-        while (r_it != rhs.body_.cbegin())
-        {
-            --r_it;
-
-            if (*r_it != 0)
-            {
-                BigInt partial;
-                partial.sign_ = 1;
-
-                for (std::size_t i = 0; i < shift; ++i)
-                {
-                    partial.body_.push_head(static_cast<std::uint8_t>(0));
-                }
-
-                int carry = 0;
-                auto l_it = lhs.body_.cend();
-
-                while (l_it != lhs.body_.cbegin())
-                {
-                    --l_it;
-
-                    carry += static_cast<int>(*l_it) * static_cast<int>(*r_it);
-                    partial.body_.push_head(static_cast<std::uint8_t>(carry % 10));
-                    carry /= 10;
-                }
-
-                if (carry > 0) partial.body_.push_head(static_cast<std::uint8_t>(carry));
-
-                result = std::move(result) + std::move(partial);
-            }
-
-            ++shift;
-        }
-
-        result.sign_ = lhs.sign_ * rhs.sign_;
-
-        return result;
-    }
+    sum,
+    multiply
 };
+
+BigInt apply(const BigInt &lhs, const BigInt &rhs, Operation operation)
+{
+    switch (operation)
+    {
+    case Operation::sum:
+        return lhs + rhs;
+    case Operation::multiply:
+        return lhs * rhs;
+    default:
+        throw std::invalid_argument("Only addition and multiplication are available.");
+    }
+}
 
 struct VerifyOperation final
 {
-    BigInt lhs_;
-    BigInt rhs_;
-    BigInt expected_;
-    BigInt result_;
-    char operation_;
-    bool ok_;
+    const BigInt lhs_;
+    const BigInt rhs_;
+    const BigInt expected_;
+    const Operation operation_;
+    const BigInt result_;
+    const bool ok_;
 
-    VerifyOperation() = delete;
-
-    VerifyOperation(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, char operation)
-        : lhs_(lhs), rhs_(rhs), expected_(expected), operation_(operation)
-    {
-        switch (operation)
-        {
-        case '+':
-            result_ = lhs_ + rhs_;
-            break;
-        case '*':
-            result_ = lhs_ * rhs_;
-            break;
-        default:
-            throw std::invalid_argument("Only addition and multiplication are available.");
-        }
-
-        ok_ = (result_ == expected_);
-    }
+    VerifyOperation(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, Operation operation)
+        : lhs_(lhs), rhs_(rhs), expected_(expected), operation_(operation),
+          result_(apply(lhs, rhs, operation)), ok_(result_ == expected) {}
 };
 
-std::ostream &operator<<(std::ostream &os, const VerifyOperation &verification)
+std::ostream &operator<<(std::ostream &os, const VerifyOperation &v)
 {
-    os << verification.lhs_ << ' ' << verification.operation_ << ' ' << verification.rhs_ << '\n';
-    os << "Result:" << ' ';
-    os << verification.result_ << '\n';
-    os << "Expected:" << ' ';
-    os << verification.expected_ << '\n';
-    os << "Verified:" << ' ';
-    os << (verification.ok_ ? "Yes" : "No") << '\n';
+    char operation = (v.operation_ == Operation::sum) ? '+' : '*';
+    os << v.lhs_ << ' ' << operation << ' ' << v.rhs_ << '\n';
+    os << "Result:   " << v.result_ << '\n';
+    os << "Expected: " << v.expected_ << '\n';
+    os << "Verified: " << (v.ok_ ? "Yes" : "No") << '\n';
 
     return os;
 }
 
+static void check(const BigInt &lhs, const BigInt &rhs, const BigInt &expected, Operation operation)
+{
+    std::cout << VerifyOperation(lhs, rhs, expected, operation) << '\n';
+}
+
 int main()
 {
-    std::cout << VerifyOperation(BigInt(100), BigInt(-1), BigInt(100 - 1), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(-100), BigInt(1), BigInt(-100 + 1), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(1000), BigInt(-999), BigInt(1000 - 999), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(5), BigInt(-5), BigInt(5 - 5), '+') << '\n';
-    std::cout << VerifyOperation(BigInt(0), BigInt(-7), BigInt(0 - 7), '+') << '\n';
+    check(100, -1, 100 - 1, Operation::sum);
+    check(-100, 1, -100 + 1, Operation::sum);
+    check(1000, -999, 1000 - 999, Operation::sum);
+    check(5, -5, 5 - 5, Operation::sum);
+    check(0, -7, 0 - 7, Operation::sum);
 
-    std::cout << VerifyOperation(BigInt(12), BigInt(12), BigInt(12 * 12), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(-12), BigInt(12), BigInt(-12 * 12), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(-12), BigInt(-12), BigInt(-12 * (-12)), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(100), BigInt(-100), BigInt(100 * (-100)), '*') << '\n';
-    std::cout << VerifyOperation(BigInt(0), BigInt(-5), BigInt(0 * (-5)), '*') << '\n';
+    check(12, 12, 12 * 12, Operation::multiply);
+    check(-12, 12, -12 * 12, Operation::multiply);
+    check(-12, -12, -12 * -12, Operation::multiply);
+    check(100, -100, 100 * -100, Operation::multiply);
+    check(0, -5, 0 * -5, Operation::multiply);
 
-    long long min_int = std::numeric_limits<int>::min();
-    long long max_int = std::numeric_limits<int>::max();
+    constexpr long long min_int = std::numeric_limits<int>::min();
+    constexpr long long max_int = std::numeric_limits<int>::max();
 
-    long long overflow = min_int + min_int;
-    std::cout << VerifyOperation(BigInt(min_int), BigInt(min_int), BigInt(overflow), '+') << '\n';
+    check(min_int, min_int, min_int + min_int, Operation::sum);
+    check(max_int, max_int, max_int + max_int, Operation::sum);
+    check(min_int, max_int, min_int * max_int, Operation::multiply);
+    check(max_int, max_int, max_int * max_int, Operation::multiply);
 
-    overflow = max_int + max_int;
-    std::cout << VerifyOperation(BigInt(max_int), BigInt(max_int), BigInt(overflow), '+') << '\n';
+    const BigInt huge("99999999999999999999");
 
-    overflow = min_int * max_int;
-    std::cout << VerifyOperation(BigInt(min_int), BigInt(max_int), BigInt(overflow), '*') << '\n';
-
-    overflow = max_int * max_int;
-    std::cout << VerifyOperation(BigInt(max_int), BigInt(max_int), BigInt(overflow), '*') << '\n';
+    check(huge, 1, BigInt("100000000000000000000"), Operation::sum);
+    check(huge, huge, BigInt("99999999999999999998"
+                             "00000000000000000001"),
+          Operation::multiply);
 
     return 0;
 }
