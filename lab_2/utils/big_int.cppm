@@ -108,6 +108,28 @@ public:
         } while (n > 0);
     }
 
+    explicit BigInt(std::string_view text)
+    {
+        const bool negative = text.starts_with('-');
+        if (negative) text.remove_prefix(1);
+
+        const auto is_digit = [](char c)
+        { return c >= '0' && c <= '9'; };
+
+        if (text.empty() || !std::ranges::all_of(text, is_digit))
+        {
+            throw std::invalid_argument("Invalid number string.");
+        }
+
+        for (const char c : text | std::views::reverse)
+        {
+            push_digit(body_, c - '0');
+        }
+
+        sign_ = negative ? -1 : 1;
+        normalize();
+    }
+
     friend std::ostream &operator<<(std::ostream &os, const BigInt &number)
     {
         if (number.sign_ < 0) os << '-';
