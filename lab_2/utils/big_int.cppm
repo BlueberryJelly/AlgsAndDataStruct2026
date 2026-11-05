@@ -121,7 +121,7 @@ public:
             throw std::invalid_argument("Invalid number string.");
         }
 
-        for (const char c : text | std::views::reverse)
+        for (const char c : std::views::reverse(text))
         {
             push_digit(body_, c - '0');
         }
