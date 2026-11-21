@@ -33,7 +33,7 @@ public:
 
     ConstIterator() noexcept = default;
 
-    explicit ConstIterator(const NodeBase *start) : iterator_(start) {}
+    explicit ConstIterator(const NodeBase *start) noexcept : iterator_(start) {}
 
     ConstIterator<T> &operator++() noexcept
     {
