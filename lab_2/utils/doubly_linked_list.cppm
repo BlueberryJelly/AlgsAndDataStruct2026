@@ -71,12 +71,12 @@ public:
         return &(static_cast<const Node<T> *>(iterator_)->value_);
     }
 
-    bool operator==(const ConstIterator &other) const noexcept
+    bool operator==(const ConstIterator<T> &other) const noexcept
     {
         return iterator_ == other.iterator_;
     }
 
-    bool operator!=(const ConstIterator &other) const noexcept
+    bool operator!=(const ConstIterator<T> &other) const noexcept
     {
         return iterator_ != other.iterator_;
     }
@@ -140,12 +140,12 @@ public:
         return &(static_cast<Node<T> *>(iterator_)->value_);
     }
 
-    bool operator==(const Iterator &other) const noexcept
+    bool operator==(const Iterator<T> &other) const noexcept
     {
         return iterator_ != other.iterator_;
     }
 
-    bool operator!=(const Iterator &other) const noexcept
+    bool operator!=(const Iterator<T> &other) const noexcept
     {
         return iterator_ != other.iterator_;
     }
