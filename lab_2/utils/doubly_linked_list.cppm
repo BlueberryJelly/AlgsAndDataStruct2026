@@ -391,7 +391,7 @@ public:
         --size_;
     }
 
-    void remove_all_value(const T &value)
+    void remove_all_value(const T &value) noexcept
     {
         NodeBase *current = sentinel_.next_;
 
