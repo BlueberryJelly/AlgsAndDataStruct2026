@@ -190,6 +190,25 @@ public:
         }
     }
 
+    template <std::input_iterator InputIt>
+    DoublyLinkedList(InputIt first, InputIt last)
+        : DoublyLinkedList()
+    {
+        try
+        {
+            while (first != last)
+            {
+                push_tail(*first);
+                ++first;
+            }
+        }
+        catch (...)
+        {
+            free_data();
+            throw;
+        }
+    }
+
     DoublyLinkedList(const DoublyLinkedList<T> &other) : DoublyLinkedList()
     {
         try
