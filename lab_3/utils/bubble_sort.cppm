@@ -12,7 +12,9 @@ Stats bubble_sort(ForwardIt first, ForwardIt last, Compare compare)
     
     Stats stats;
 
-    if (first == last) return stats;
+    std::ptrdiff_t size = std::distance(first, last);
+    
+    if (size == 0 || size == 1) return stats;
 
     DoublyLinkedList<T> list(first, last);
     stats.copy_count_ += list.size();
