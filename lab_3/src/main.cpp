@@ -1,6 +1,8 @@
 import std;
 import stats;
+import doubly_linked_list;
 import bubble_sort;
+import comb_sort;
 
 std::ostream &operator<<(std::ostream &os, const Stats &stats)
 {
