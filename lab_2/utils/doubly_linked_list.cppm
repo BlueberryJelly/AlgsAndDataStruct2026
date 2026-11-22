@@ -142,7 +142,7 @@ public:
 
     bool operator==(const Iterator<T> &other) const noexcept
     {
-        return iterator_ != other.iterator_;
+        return iterator_ == other.iterator_;
     }
 
     bool operator!=(const Iterator<T> &other) const noexcept
