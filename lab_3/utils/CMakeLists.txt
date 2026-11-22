@@ -1,3 +1,5 @@
 add_cpp_module_library(stats stats.cppm)
 add_cpp_module_library(bubble_sort bubble_sort.cppm)
 target_link_libraries(bubble_sort PUBLIC stats PRIVATE doubly_linked_list)
+add_cpp_module_library(comb_sort comb_sort.cppm)
+target_link_libraries(comb_sort PUBLIC stats)
