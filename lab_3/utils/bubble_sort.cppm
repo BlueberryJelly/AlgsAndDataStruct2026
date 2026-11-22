@@ -4,50 +4,43 @@ import std;
 import stats;
 import doubly_linked_list;
 
-export template <typename T, std::forward_iterator ForwardIt>
-    requires std::sortable<ForwardIt>
-Stats bubble_sort(ForwardIt first, ForwardIt last)
+export template <std::forward_iterator ForwardIt, typename Compare>
+    requires std::sortable<ForwardIt, Compare>
+Stats bubble_sort(ForwardIt first, ForwardIt last, Compare compare)
 {
+    using T = std::iter_value_t<ForwardIt>;
+    
     Stats stats;
 
-    if (first == last)
-    {
-        return stats;
-    }
+    if (first == last) return stats;
 
     DoublyLinkedList<T> list(first, last);
     stats.copy_count_ += list.size();
 
-    for (auto stop = list.end(); stop != ++list.begin(); --stop)
+    auto second = ++(list.begin());
+
+    for (auto stop = list.end(); stop != second; --stop)
     {
         auto current = list.begin();
-        auto next = ++(list.begin());
-
-        std::size_t swaps = 0;
+        auto next = second;
+        bool swapped = false;
 
         while (next != stop)
         {
             ++stats.comparison_count_;
 
-            if (*current > *next)
+            if (std::invoke(compare, *next, *current))
             {
-                T tmp = std::move(*current);
-                *current = std::move(*next);
-                *next = std::move(tmp);
-                ++swaps;
-
-                if constexpr (!(std::is_move_constructible_v<T> && std::is_move_assignable_v<T>))
-                {
-                    stats.copy_count_ += 3;
-                }
+                std::iter_swap(current, next);
+                stats.copy_count_ += 3;
+                swapped = true;
             }
 
             ++current;
             ++next;
         }
 
-        if (swaps == 0)
-            break;
+        if (!swapped) break;
     }
 
     std::move(list.begin(), list.end(), first);
