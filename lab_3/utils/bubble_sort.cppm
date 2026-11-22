@@ -50,7 +50,7 @@ Stats bubble_sort(ForwardIt first, ForwardIt last)
             break;
     }
 
-    list.copy_to(first, last);
+    std::move(list.begin(), list.end(), first);
     stats.copy_count_ += list.size();
 
     return stats;

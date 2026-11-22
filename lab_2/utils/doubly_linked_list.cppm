@@ -441,20 +441,6 @@ public:
     }
 
     std::size_t size() const noexcept { return size_; }
-
-    template <typename Iter>
-        requires(std::output_iterator<Iter, const T &> &&
-                 std::sentinel_for<Iter, Iter>)
-    void copy_to(Iter first, Iter last) const
-    {
-        const NodeBase *current = sentinel_.next_;
-        while (first != last && current != &sentinel_)
-        {
-            *first = static_cast<const Node<T> *>(current)->value_;
-            ++first;
-            current = current->next_;
-        }
-    }
 };
 
 export template <typename T>
